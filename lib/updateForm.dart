@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:matrimonial_app/UserList.dart';
 import 'package:matrimonial_app/favUser.dart';
 import 'package:matrimonial_app/home.dart';
 import 'package:matrimonial_app/user.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:matrimonial_app/userList.dart';
 
 class User {
   String name;
@@ -32,21 +32,25 @@ class User {
 }
 
 class UpdateUser extends StatefulWidget {
-  const UpdateUser({super.key});
+  final int userIndex;
+  const UpdateUser({super.key,required this.userIndex});
 
   @override
   State<UpdateUser> createState() => _UpdateUserState();
 }
 
 class _UpdateUserState extends State<UpdateUser> {
-  TextEditingController name = TextEditingController();
-  TextEditingController email = TextEditingController();
-  TextEditingController phone = TextEditingController();
-  TextEditingController dob = TextEditingController();
-  TextEditingController city = TextEditingController();
-  // TextEditingController gender = TextEditingController();
+  @override
+  TextEditingController name = TextEditingController(text: userForUpdate['name'].toString());
+  TextEditingController email = TextEditingController(text: userForUpdate['email'].toString());
+  TextEditingController phone = TextEditingController(text: userForUpdate['phone'].toString());
+  TextEditingController dob = TextEditingController(text: userForUpdate['dob'].toString());
+  TextEditingController city = TextEditingController(text: userForUpdate['city'].toString());
+  TextEditingController gender = TextEditingController(text: userForUpdate['gender'].toString());
+  TextEditingController isFav = TextEditingController(text: userForUpdate['isFav'].toString());
+
   // TextEditingController hobbies = TextEditingController();
-  TextEditingController password = TextEditingController();
+  // TextEditingController password = TextEditingController(text: userForUpdate['password'].toString());
 
   bool isMale = true;
 
@@ -208,57 +212,6 @@ class _UpdateUserState extends State<UpdateUser> {
                           height: 30,
                         ),
                         TextFormField(
-                          controller: password,
-                          obscureText: isPasswordHidden,
-                          decoration: InputDecoration(
-                            labelText: "Password",
-                            prefixIcon: Icon(Icons.lock,
-                                color:
-                                isValidpass ? Colors.black54 : Colors.red),
-                            suffixIcon: Padding(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 10.0, 0),
-                              child: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isPasswordHidden = !isPasswordHidden;
-                                  });
-                                },
-                                icon: Icon(
-                                  isPasswordHidden
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                ),
-                              ),
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                              BorderRadius.all(Radius.circular(15)),
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              setState(() {
-                                isValidpass = false;
-                              });
-                              return 'Please enter password';
-                            }
-                            if (value.length < 8) {
-                              setState(() {
-                                isValidpass = false;
-                              });
-                              return 'Enter at least 8 digit Password';
-                            } else {
-                              setState(() {
-                                isValidpass = true;
-                              });
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(
-                          height: 30,
-                        ),
-                        TextFormField(
                           controller: phone,
                           maxLength: 10,
                           inputFormatters: [FilteringTextInputFormatter.digitsOnly],                          decoration: InputDecoration(
@@ -308,7 +261,7 @@ class _UpdateUserState extends State<UpdateUser> {
                                   child: Row(
                                     children: [
                                       Radio<bool>(
-                                        value: true,
+                                        value: gender.text == 'Male'? true : false,
                                         groupValue: isMale,
                                         onChanged: (value) {
                                           setState(() {
@@ -403,7 +356,7 @@ class _UpdateUserState extends State<UpdateUser> {
                           height: 30,
                         ),
                         DropdownButtonFormField<String>(
-                          value: selectedCity,
+                          value: city.text,
                           focusColor: Colors.transparent,
                           decoration: InputDecoration(
                             labelText: "Select Your City",
@@ -423,8 +376,8 @@ class _UpdateUserState extends State<UpdateUser> {
                           }).toList(),
                           onChanged: (String? newValue) {
                             setState(() {
-                              selectedCity =
-                                  newValue; // Update the selected city
+                              city.text =
+                                  newValue!; // Update the selected city
                             });
                           },
                           validator: (value) {
@@ -478,15 +431,13 @@ class _UpdateUserState extends State<UpdateUser> {
                                             email: email.text,
                                             phone: phone.text,
                                             dob: dob.text,
-                                            city: selectedCity ?? '',
+                                            city: city.text ?? '',
                                             gender: isMale,
-                                            isFav:false
-                                          // hobbies: selectedHobbiesString,
+                                            isFav: userForUpdate['isFav'],                                          // hobbies: selectedHobbiesString,
                                           // password: password.text,
                                         );
-
                                         setState(() {
-                                          users.insert(0,{
+                                          users[widget.userIndex] = {
                                             'name': newUser.name,
                                             'email': newUser.email,
                                             'phone': newUser.phone,
@@ -494,15 +445,12 @@ class _UpdateUserState extends State<UpdateUser> {
                                             'city': newUser.city,
                                             'gender': newUser.gender,
                                             'isFav': newUser.isFav,
-                                            // 'hobbies': newUser.hobbies,
-                                            // 'password': newUser.password,
-                                          });
+                                          };
                                         });
                                         name.clear();
                                         email.clear();
                                         phone.clear();
                                         dob.clear();
-                                        password.clear();
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(
@@ -512,7 +460,7 @@ class _UpdateUserState extends State<UpdateUser> {
                                                     color: Colors.green),
                                                 SizedBox(width: 8),
                                                 Text(
-                                                    "User added successfully!"),
+                                                    "User Updated successfully!"),
                                               ],
                                             ),
                                             backgroundColor: Colors.black87,
@@ -520,7 +468,7 @@ class _UpdateUserState extends State<UpdateUser> {
                                             duration: Duration(seconds: 3),
                                           ),
                                         );
-
+                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>Userlist()));
                                         print(users);
                                       } else {
                                         ScaffoldMessenger.of(context)
@@ -569,7 +517,6 @@ class _UpdateUserState extends State<UpdateUser> {
                                       setState(() {
                                         name.clear();
                                         email.clear();
-                                        password.clear();
                                         phone.clear();
                                         dob.clear();
                                         city.clear();
@@ -595,69 +542,6 @@ class _UpdateUserState extends State<UpdateUser> {
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 20,
-              color: Colors.black.withOpacity(.1),
-            )
-          ],
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8),
-            child: GNav(
-              rippleColor: Colors.grey[300]!,
-              hoverColor: Colors.grey[100]!,
-              gap: 8,
-              activeColor: Colors.black,
-              iconSize: 24,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              duration: Duration(milliseconds: 400),
-              tabBackgroundColor: Colors.grey[100]!,
-              color: Colors.black,
-              tabs: [
-                GButton(
-                  icon: Icons.home,
-                  text: 'Home',
-                  onPressed: (){
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomePage()));
-                  },
-                ),
-                GButton(
-                  icon: Icons.add_box_outlined,
-                  text: 'Add User',
-                  onPressed: (){
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> CrudUser()));
-                  },
-                ),
-                GButton(
-                  icon: Icons.list_alt_rounded,
-                  text: 'User List',
-                  onPressed: (){
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Userlist()));
-                  },
-                ),
-                GButton(
-                  icon: Icons.favorite,
-                  text: 'Favorite',
-                  onPressed: (){
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> FavUsers()));
-                  },
-                ),
-              ],
-              selectedIndex: _selectedIndex,
-              onTabChange: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-            ),
           ),
         ),
       ),
