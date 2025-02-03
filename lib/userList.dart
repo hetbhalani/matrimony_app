@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:matrimonial_app/favUser.dart';
 import 'package:matrimonial_app/home.dart';
+import 'package:matrimonial_app/updateForm.dart';
 import 'package:matrimonial_app/user.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
 import 'abotUs.dart';
 // import 'package:line_icons/line_icons.dart';
+
+Map<String,dynamic> userForUpdate = {};
 
 class Userlist extends StatefulWidget {
   const Userlist({super.key});
@@ -393,8 +396,10 @@ class _UserlistState extends State<Userlist> {
                                     iconSize: 25,
                                     color: Colors.blueAccent,
                                     onPressed: () {
-                                      // Handle edit button press
                                       print("Edit button pressed");
+                                      userForUpdate.addAll(searchedUsers[index]);
+                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>UpdateUser(userIndex: index)));
+                                      print(userForUpdate);
                                     },
                                   ),
                                   IconButton(
