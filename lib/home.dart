@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:matrimonial_app/UserList.dart';
+import 'package:matrimonial_app/abotUs.dart';
 import 'package:matrimonial_app/favUser.dart';
 import 'dart:ui';
 
@@ -187,7 +188,8 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(width: 20),
                   _buildBlurredButton(
                     onPressed: () {
-                      print('Button pressed!');
+                      print('Button 4 pressed');
+                      Navigator.pushReplacement(context,  MaterialPageRoute(builder: (context) => AboutUs()));
                     },
                     child: Column(
                       mainAxisSize: MainAxisSize.min,

@@ -70,7 +70,7 @@ class _AboutUsState extends State<AboutUs> {
                   },
                 ),
                 GButton(
-                  icon: Icons.favorite,
+                  icon: Icons.favorite_border_rounded,
                   text: 'Favorite',
                   onPressed: (){
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> FavUsers()));

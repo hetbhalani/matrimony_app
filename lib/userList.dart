@@ -408,26 +408,39 @@ class _UserlistState extends State<Userlist> {
                                     color: Colors.red,
                                     onPressed: () {
                                       print("Delete button pressed");
-                                      setState(() {
-                                        searchedUsers.removeAt(index);
+                                      showDialog(context: context, builder: (BuildContext context){
+                                        return AlertDialog(title: Text("Are You Sure?"),actions: [
+                                          TextButton(onPressed: (){
+                                            Navigator.of(context).pop();
+                                          }, child: Text("cancle")),
+                                          TextButton(onPressed: (){
+                                            setState(() {
+                                              searchedUsers.removeAt(index);
+                                              users.removeAt(index);
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  content: Row(
+                                                    children: [
+                                                      Icon(Icons.delete_outline_rounded,
+                                                          color: Colors.red),
+                                                      SizedBox(width: 8),
+                                                      Text(
+                                                          "User Deleted successfully!"),
+                                                    ],
+                                                  ),
+                                                  backgroundColor: Colors.black87,
+                                                  behavior: SnackBarBehavior.floating,
+                                                  duration: Duration(seconds: 3),
+                                                ),
+                                              );
+                                              Navigator.of(context).pop();
+                                            });
+                                          }, child: Text("Delete",style: TextStyle(color: Colors.red),)),
+                                        ],);
                                       });
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Row(
-                                            children: [
-                                              Icon(Icons.delete_outline_rounded,
-                                                  color: Colors.red),
-                                              SizedBox(width: 8),
-                                              Text(
-                                                  "User Deleted successfully!"),
-                                            ],
-                                          ),
-                                          backgroundColor: Colors.black87,
-                                          behavior: SnackBarBehavior.floating,
-                                          duration: Duration(seconds: 3),
-                                        ),
-                                      );
+
+
                                     },
                                   ),
                                 ],
@@ -485,7 +498,7 @@ class _UserlistState extends State<Userlist> {
                   },
                 ),
                 GButton(
-                  icon: Icons.favorite,
+                  icon: Icons.favorite_border_rounded,
                   text: 'Favorite',
                   onPressed: () {
                     Navigator.pushReplacement(context,
