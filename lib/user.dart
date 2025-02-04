@@ -88,6 +88,7 @@ class _CrudUserState extends State<CrudUser> {
   String? selectedCity;
   List<String> hobbies = ["Reading", "Traveling", "Gaming", "Cooking"];
   List<bool> selectedHobbies = [false, false, false, false];
+  DateTime initDate = DateTime.now();
 
   List<String> cities = [
     'Junagadh',
@@ -397,46 +398,44 @@ class _CrudUserState extends State<CrudUser> {
                             ),
                           ),
                           onTap: () async {
-                            // Open the date picker when tapped
                             DateTime? pickedDate = await showDatePicker(
                               context: context,
-                              initialDate: DateTime.now(),
+                              initialDate: initDate,
                               firstDate: DateTime(1900),
                               lastDate: DateTime.now(),
                             );
+                            initDate = pickedDate!;
 
                             if (pickedDate != null) {
-                              setState(() {
-                                dob.text = DateFormat('dd-MM-yyyy').format(pickedDate);
-                              });
+                              // Calculate age
+                              DateTime today = DateTime.now();
+                              int age = today.year - pickedDate.year;
+
+                              // Check age based on gender
+                              int requiredAge = isMale ? 21 : 18;
+
+                              if (age < requiredAge) {
+                                // Show an error dialog
+                                await showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text('Age Validation'),
+                                    content: Text('Minimum age is $requiredAge for ${isMale ? "Male" : "Female"}'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(context).pop(),
+                                        child: Text('OK'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              } else {
+                                setState(() {
+                                  dob.text = DateFormat('dd-MM-yyyy').format(pickedDate);
+                                  isValiddob = true;
+                                });
+                              }
                             }
-                          },
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              setState(() {
-                                isValiddob = false;
-                              });
-                              return 'Please select your date of birth';
-                            }
-                            List split = value.split('-');
-                            int age = DateTime.now().year - int.parse(split[2]);
-                            int requiredAge = isMale ? 21 : 18;
-                            // print(DateTime.now().year.toString());
-                            if (age < requiredAge) {
-                              setState(() {
-                                isValiddob = false;
-                              });
-                              // print("no");
-                              return 'Minimum required age is ${requiredAge} for ${isMale?'Male':'Female'}';
-                            } else {
-                              setState(() {
-                                isValiddob = true;
-                              });
-                            }
-                            // else{
-                            //   print("yesssss");
-                            // }
-                            return null;
                           },
                         ),
                         SizedBox(
@@ -678,7 +677,7 @@ class _CrudUserState extends State<CrudUser> {
                   },
                 ),
                 GButton(
-                  icon: Icons.favorite,
+                  icon: Icons.favorite_border_rounded,
                   text: 'Favorite',
                   onPressed: (){
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> FavUsers()));

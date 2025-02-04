@@ -46,13 +46,13 @@ class _UpdateUserState extends State<UpdateUser> {
   TextEditingController phone = TextEditingController(text: userForUpdate['phone'].toString());
   TextEditingController dob = TextEditingController(text: userForUpdate['dob'].toString());
   TextEditingController city = TextEditingController(text: userForUpdate['city'].toString());
-  TextEditingController gender = TextEditingController(text: userForUpdate['gender'].toString());
+  TextEditingController gender = TextEditingController(text: userForUpdate['gender'] == true ? 'Male' : 'Female');
   TextEditingController isFav = TextEditingController(text: userForUpdate['isFav'].toString());
 
   // TextEditingController hobbies = TextEditingController();
   // TextEditingController password = TextEditingController(text: userForUpdate['password'].toString());
 
-  bool isMale = true;
+  bool isMale = userForUpdate['gender'];
 
   String? selectedCity;
   List<String> cities = [
@@ -261,7 +261,7 @@ class _UpdateUserState extends State<UpdateUser> {
                                   child: Row(
                                     children: [
                                       Radio<bool>(
-                                        value: gender.text == 'Male'? true : false,
+                                        value: true,
                                         groupValue: isMale,
                                         onChanged: (value) {
                                           setState(() {
@@ -368,16 +368,15 @@ class _UpdateUserState extends State<UpdateUser> {
                             ),
                           ),
                           items: cities
-                              .map<DropdownMenuItem<String>>((String city) {
+                              .map<DropdownMenuItem<String>>((String city1) {
                             return DropdownMenuItem<String>(
-                              value: city,
-                              child: Text(city),
+                              value: city1,
+                              child: Text(city1),
                             );
                           }).toList(),
                           onChanged: (String? newValue) {
                             setState(() {
-                              city.text =
-                                  newValue!; // Update the selected city
+                              city.text = newValue!;
                             });
                           },
                           validator: (value) {
@@ -427,13 +426,13 @@ class _UpdateUserState extends State<UpdateUser> {
                                     onPressed: () {
                                       if (fk.currentState!.validate()) {
                                         User newUser = User(
-                                            name: name.text,
-                                            email: email.text,
-                                            phone: phone.text,
-                                            dob: dob.text,
-                                            city: city.text ?? '',
-                                            gender: isMale,
-                                            isFav: userForUpdate['isFav'],                                          // hobbies: selectedHobbiesString,
+                                          name: name.text,
+                                          email: email.text,
+                                          phone: phone.text,
+                                          dob: dob.text,
+                                          city: city.text ?? '',
+                                          gender: isMale,
+                                          isFav: userForUpdate['isFav'],                                          // hobbies: selectedHobbiesString,
                                           // password: password.text,
                                         );
                                         setState(() {
