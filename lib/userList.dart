@@ -264,7 +264,33 @@ class _UserlistState extends State<Userlist> {
                                               ],
                                             ),
                                           ),
-
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 5),
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.sports_esports_outlined,
+                                                    color: Colors.redAccent,
+                                                    size: 22), // Colored Icons
+                                                SizedBox(width: 10),
+                                                Text("Hobbies: ",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                        FontWeight.bold,
+                                                        fontSize: 16)),
+                                                Expanded(
+                                                  child: Text(
+                                                    // Correctly display hobbies
+                                                      users[index]['hobbies'] != null
+                                                          ? (users[index]['hobbies'] as List).join(", ")
+                                                          : "No hobbies",
+                                                      style: TextStyle(fontSize: 16),
+                                                      overflow: TextOverflow.ellipsis
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
                                                 vertical: 5),

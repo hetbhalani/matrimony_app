@@ -5,7 +5,6 @@ import 'package:matrimonial_app/abotUs.dart';
 import 'package:matrimonial_app/favUser.dart';
 import 'dart:ui';
 import 'package:matrimonial_app/home.dart';
-import 'package:matrimonial_app/user.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -50,6 +49,7 @@ class User {
   String city;
   bool gender;
   bool isFav;
+  List<String> hobbies;
   // String hobbies;
   // String password;
 
@@ -61,6 +61,7 @@ class User {
     required this.city,
     required this.gender,
     required this.isFav,
+    required this.hobbies,
     // required this.hobbies,
     // required this.password,
   });
@@ -441,6 +442,38 @@ class _CrudUserState extends State<CrudUser> {
                         SizedBox(
                           height: 30,
                         ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Hobbies",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold
+                                ),
+                              ),
+                              Column(
+                                children: List.generate(hobbies.length, (index) {
+                                  return CheckboxListTile(
+                                    title: Text(hobbies[index]),
+                                    value: selectedHobbies[index],
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        selectedHobbies[index] = value ?? false;
+                                      });
+                                    },
+                                    controlAffinity: ListTileControlAffinity.leading,
+                                  );
+                                }),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
                         DropdownButtonFormField<String>(
                           value: selectedCity,
                           focusColor: Colors.transparent,
@@ -483,17 +516,6 @@ class _CrudUserState extends State<CrudUser> {
                           height: 30,
                         ),
                         Container(
-                          // decoration: BoxDecoration(
-                          //   gradient: LinearGradient(
-                          //     colors: [
-                          //       Color.fromRGBO(188, 18, 238, 0.5),
-                          //       Color.fromRGBO(255, 100, 200, 0.5),
-                          //     ],
-                          //     begin: Alignment.topLeft,
-                          //     end: Alignment.bottomRight,
-                          //   ),
-                          //   borderRadius: BorderRadius.circular(12), // Match button corners
-                          // ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -512,6 +534,12 @@ class _CrudUserState extends State<CrudUser> {
                                     ),
                                     onPressed: () {
                                       if (fk.currentState!.validate()) {
+                                        List<String> selectedHobbiesList = [];
+                                        for (int i = 0; i < hobbies.length; i++) {
+                                          if (selectedHobbies[i]) {
+                                            selectedHobbiesList.add(hobbies[i]);
+                                          }
+                                        }
                                         User newUser = User(
                                           name: name.text,
                                           email: email.text,
@@ -519,7 +547,8 @@ class _CrudUserState extends State<CrudUser> {
                                           dob: dob.text,
                                           city: selectedCity ?? '',
                                           gender: isMale,
-                                          isFav:false
+                                          isFav:false,
+                                          hobbies: selectedHobbiesList,
                                           // hobbies: selectedHobbiesString,
                                           // password: password.text,
                                         );
@@ -533,7 +562,7 @@ class _CrudUserState extends State<CrudUser> {
                                             'city': newUser.city,
                                             'gender': newUser.gender,
                                             'isFav': newUser.isFav,
-                                            // 'hobbies': newUser.hobbies,
+                                            'hobbies': newUser.hobbies,
                                             // 'password': newUser.password,
                                           });
                                         });
