@@ -91,19 +91,7 @@ class _UpdateUserState extends State<UpdateUser> {
             ),
           ],
         ),
-        backgroundColor: Color.fromRGBO(255, 34, 34, 0.8),
-        // flexibleSpace: Container(
-        //   decoration: BoxDecoration(
-        //     gradient: LinearGradient(
-        //       colors: [
-        //         Color.fromRGBO(188, 18, 238, 0.5),
-        //         Color.fromRGBO(255, 100, 200, 0.5),
-        //       ],
-        //       begin: Alignment.topLeft,
-        //       end: Alignment.bottomRight,
-        //     ),
-        //   ),
-        // ),
+        backgroundColor: Color.fromRGBO(255, 34, 34, 0.8)
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -127,7 +115,7 @@ class _UpdateUserState extends State<UpdateUser> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(30, 20, 0, 0),
                 child: Text(
-                  "User Registration Form",
+                  "User Update Form",
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -396,17 +384,6 @@ class _UpdateUserState extends State<UpdateUser> {
                           height: 30,
                         ),
                         Container(
-                          // decoration: BoxDecoration(
-                          //   gradient: LinearGradient(
-                          //     colors: [
-                          //       Color.fromRGBO(188, 18, 238, 0.5),
-                          //       Color.fromRGBO(255, 100, 200, 0.5),
-                          //     ],
-                          //     begin: Alignment.topLeft,
-                          //     end: Alignment.bottomRight,
-                          //   ),
-                          //   borderRadius: BorderRadius.circular(12), // Match button corners
-                          // ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -499,37 +476,6 @@ class _UpdateUserState extends State<UpdateUser> {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: 50,
-                                  ),
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                      Color.fromRGBO(255, 48, 48, 0.8),
-                                      minimumSize: Size(10, 50),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            12), // Match gradient corners
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        name.clear();
-                                        email.clear();
-                                        phone.clear();
-                                        dob.clear();
-                                        city.clear();
-                                      });
-                                    },
-                                    child: Text(
-                                      "Reset",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white, // Text color
-                                      ),
-                                    ),
-                                  ),
                                 ],
                               ),
                             ],
@@ -545,6 +491,5 @@ class _UpdateUserState extends State<UpdateUser> {
         ),
       ),
     );
-
   }
 }
