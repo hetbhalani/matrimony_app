@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:matrimonial_app/UserList.dart';
 import 'package:matrimonial_app/abotUs.dart';
 import 'package:matrimonial_app/favUser.dart';
+import 'package:matrimonial_app/db.dart';
 import 'dart:ui';
 import 'package:matrimonial_app/home.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -532,7 +533,7 @@ class _CrudUserState extends State<CrudUser> {
                                             12), // Match gradient corners
                                       ),
                                     ),
-                                    onPressed: () {
+                                    onPressed: () async{
                                       if (fk.currentState!.validate()) {
                                         List<String> selectedHobbiesList = [];
                                         for (int i = 0; i < hobbies.length; i++) {
@@ -553,24 +554,43 @@ class _CrudUserState extends State<CrudUser> {
                                           // password: password.text,
                                         );
 
+                                        // setState(() {
+                                        //   users.insert(0,{
+                                        //     'name': newUser.name,
+                                        //     'email': newUser.email,
+                                        //     'phone': newUser.phone,
+                                        //     'dob': newUser.dob,
+                                        //     'city': newUser.city,
+                                        //     'gender': newUser.gender,
+                                        //     'isFav': newUser.isFav,
+                                        //     'hobbies': newUser.hobbies,
+                                        //     // 'password': newUser.password,
+                                        //   });
+                                        // });
+
+                                        await MatrimonyDB().addUser(
+                                            newUser.name,
+                                            newUser.email,
+                                            newUser.phone,
+                                            newUser.dob,
+                                            newUser.city,
+                                            newUser.gender,
+                                            newUser.hobbies,
+                                            newUser.isFav
+                                        );
+
+                                        List<Map<String,dynamic>> updatedUser = await MatrimonyDB().fetchUsers();
+
                                         setState(() {
-                                          users.insert(0,{
-                                            'name': newUser.name,
-                                            'email': newUser.email,
-                                            'phone': newUser.phone,
-                                            'dob': newUser.dob,
-                                            'city': newUser.city,
-                                            'gender': newUser.gender,
-                                            'isFav': newUser.isFav,
-                                            'hobbies': newUser.hobbies,
-                                            // 'password': newUser.password,
-                                          });
+                                          users = updatedUser;
                                         });
+
                                         name.clear();
                                         email.clear();
                                         phone.clear();
                                         dob.clear();
                                         password.clear();
+
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(

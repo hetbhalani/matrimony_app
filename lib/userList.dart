@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:matrimonial_app/db.dart';
 import 'package:matrimonial_app/favUser.dart';
 import 'package:matrimonial_app/home.dart';
 import 'package:matrimonial_app/updateForm.dart';
@@ -18,6 +19,7 @@ class Userlist extends StatefulWidget {
 }
 
 class _UserlistState extends State<Userlist> {
+  final MatrimonyDB db = MatrimonyDB();
   TextEditingController search = TextEditingController();
   int _selectedIndex = 1;
   final List<Widget> _pages = [
@@ -49,18 +51,30 @@ class _UserlistState extends State<Userlist> {
   ];
 
   List<Map<String, dynamic>> searchedUsers = [];
+  List<Map<String, dynamic>> allUsers = [];
+
 
   void initState() {
     super.initState();
-    searchedUsers = List.from(users);
+    loadUsers();
+  }
+
+  void loadUsers(){
+    Future<void> loadUsers() async {
+      final users = await db.fetchUsers();
+      setState(() {
+        allUsers = users;
+        searchedUsers = List.from(users);
+      });
+    }
   }
 
   void filterUsers(String query) {
     setState(() {
       if (query.isEmpty) {
-        searchedUsers = List.from(users);
+        searchedUsers = List.from(allUsers);
       } else {
-        searchedUsers = users.where((user) {
+        searchedUsers = allUsers.where((user) {
           return user['name'].toLowerCase().contains(query.toLowerCase()) ||
               user['city'].toLowerCase().contains(query.toLowerCase());
         }).toList();
@@ -159,164 +173,38 @@ class _UserlistState extends State<Userlist> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5),
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.email,
-                                                    color: Colors.redAccent,
-                                                    size: 22), // Colored Icons
-                                                SizedBox(width: 10),
-                                                Text("Email: ",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 16)),
-                                                Expanded(
-                                                  child: Text(
-                                                      searchedUsers[index]
-                                                          ['email'],
-                                                      style: TextStyle(
-                                                          fontSize: 16),
-                                                      overflow: TextOverflow
-                                                          .ellipsis),
-                                                ),
-                                              ],
-                                            ),
+                                          userInfo(
+                                            icon: Icons.email_outlined,
+                                            label: "Email",
+                                            value: searchedUsers[index]['email'],
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5),
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.phone,
-                                                    color: Colors.redAccent,
-                                                    size: 22), // Colored Icons
-                                                SizedBox(width: 10),
-                                                Text("Phone: ",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                        FontWeight.bold,
-                                                        fontSize: 16)),
-                                                Expanded(
-                                                  child: Text(
-                                                      searchedUsers[index]
-                                                      ['phone'],
-                                                      style: TextStyle(
-                                                          fontSize: 16),
-                                                      overflow: TextOverflow
-                                                          .ellipsis),
-                                                ),
-                                              ],
-                                            ),
+                                          userInfo(
+                                            icon: Icons.phone,
+                                            label: "Phone",
+                                            value: searchedUsers[index]['phone'],
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5),
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.person,
-                                                    color: Colors.redAccent,
-                                                    size: 22), // Colored Icons
-                                                SizedBox(width: 10),
-                                                Text("Gender: ",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                        FontWeight.bold,
-                                                        fontSize: 16)),
-                                                Expanded(
-                                                  child: Text(
-                                                      searchedUsers[index]['gender']
-                                                          ? "Male"
-                                                          : "Female",
-                                                      style: TextStyle(
-                                                          fontSize: 16),
-                                                      overflow: TextOverflow
-                                                          .ellipsis),
-                                                ),
-                                              ],
-                                            ),
+                                          userInfo(
+                                            icon: Icons.person,
+                                            label: "Gender",
+                                            value: searchedUsers[index]['gender'] ? "Male" : "Female",
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5),
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.location_city,
-                                                    color: Colors.redAccent,
-                                                    size: 22), // Colored Icons
-                                                SizedBox(width: 10),
-                                                Text("City: ",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                        FontWeight.bold,
-                                                        fontSize: 16)),
-                                                Expanded(
-                                                  child: Text(
-                                                      searchedUsers[index]
-                                                      ['city'],
-                                                      style: TextStyle(
-                                                          fontSize: 16),
-                                                      overflow: TextOverflow
-                                                          .ellipsis),
-                                                ),
-                                              ],
-                                            ),
+                                          userInfo(
+                                            icon: Icons.sports_esports_outlined,
+                                            label: "Hobbies",
+                                            value: allUsers[index]['hobbies'] != null
+                                                ? (allUsers[index]['hobbies'] as List).join(", ")
+                                                : "No hobbies",
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5),
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.sports_esports_outlined,
-                                                    color: Colors.redAccent,
-                                                    size: 22), // Colored Icons
-                                                SizedBox(width: 10),
-                                                Text("Hobbies: ",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                        FontWeight.bold,
-                                                        fontSize: 16)),
-                                                Expanded(
-                                                  child: Text(
-                                                    // Correctly display hobbies
-                                                      users[index]['hobbies'] != null
-                                                          ? (users[index]['hobbies'] as List).join(", ")
-                                                          : "No hobbies",
-                                                      style: TextStyle(fontSize: 16),
-                                                      overflow: TextOverflow.ellipsis
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                          userInfo(
+                                            icon: Icons.location_city_outlined,
+                                            label: "City",
+                                            value: searchedUsers[index]['city'],
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 5),
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.cake_rounded,
-                                                    color: Colors.redAccent,
-                                                    size: 22), // Colored Icons
-                                                SizedBox(width: 10),
-                                                Text("Age: ",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                        FontWeight.bold,
-                                                        fontSize: 16)),
-                                                Expanded(
-                                                  child: Text(
-                                                    "${calcAge(searchedUsers[index]['dob'])} Years",
-                                                      style: TextStyle(
-                                                          fontSize: 16),
-                                                      overflow: TextOverflow
-                                                          .ellipsis),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-
+                                          userInfo(
+                                            icon: Icons.cake_rounded,
+                                            label: "Age",
+                                            value: "${calcAge(searchedUsers[index]['dob'])} Years",
+                                          )
                                         ],
                                       ),
                                     ),
@@ -403,17 +291,17 @@ class _UserlistState extends State<Userlist> {
                                     iconSize: 25,
                                     onPressed: () {
                                       setState(() {
-                                        if (!users[index]['isFav']) {
-                                          FavUser.add(users[index]);
+                                        if (!allUsers[index]['isFav']) {
+                                          FavUser.add(allUsers[index]);
                                         } else {
                                           FavUser.removeWhere((user) =>
                                               user['email'] ==
-                                              users[index]['email']);
+                                                  allUsers[index]['email']);
                                         }
                                         print(FavUser);
                                         print("Fav btn pressed");
-                                        users[index]['isFav'] =
-                                            !users[index]['isFav'];
+                                        allUsers[index]['isFav'] =
+                                            !allUsers[index]['isFav'];
                                       });
                                     },
                                   ),
@@ -442,7 +330,7 @@ class _UserlistState extends State<Userlist> {
                                           TextButton(onPressed: (){
                                             setState(() {
                                               searchedUsers.removeAt(index);
-                                              users.removeAt(index);
+                                              allUsers.removeAt(index);
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(
@@ -465,8 +353,6 @@ class _UserlistState extends State<Userlist> {
                                           }, child: Text("Delete",style: TextStyle(color: Colors.red),)),
                                         ],);
                                       });
-
-
                                     },
                                   ),
                                 ],
@@ -557,4 +443,28 @@ class _UserlistState extends State<Userlist> {
     List split = val.split('-');
     return ((DateTime.now().year)) - int.parse(split[2]);
   }
+
+  Widget userInfo({required IconData icon, required String label, required String value}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.redAccent, size: 22),
+          SizedBox(width: 10),
+          Text(
+            "$label: ",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 16),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 }
