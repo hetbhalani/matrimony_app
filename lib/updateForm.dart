@@ -13,8 +13,8 @@ class User {
   String phone;
   String dob;
   String city;
-  bool gender;
-  bool isFav;
+  String gender;
+  int isFav;
   // String hobbies;
   // String password;
 
@@ -46,13 +46,12 @@ class _UpdateUserState extends State<UpdateUser> {
   TextEditingController phone = TextEditingController(text: userForUpdate['phone'].toString());
   TextEditingController dob = TextEditingController(text: userForUpdate['dob'].toString());
   TextEditingController city = TextEditingController(text: userForUpdate['city'].toString());
-  TextEditingController gender = TextEditingController(text: userForUpdate['gender'] == true ? 'Male' : 'Female');
+  TextEditingController gender = TextEditingController(text: userForUpdate['gender'].toString());
   TextEditingController isFav = TextEditingController(text: userForUpdate['isFav'].toString());
-
+  String selectedGender = userForUpdate['gender'].toString();
   // TextEditingController hobbies = TextEditingController();
   // TextEditingController password = TextEditingController(text: userForUpdate['password'].toString());
 
-  bool isMale = userForUpdate['gender'];
 
   String? selectedCity;
   List<String> cities = [
@@ -248,12 +247,12 @@ class _UpdateUserState extends State<UpdateUser> {
                                 Expanded(
                                   child: Row(
                                     children: [
-                                      Radio<bool>(
-                                        value: true,
-                                        groupValue: isMale,
+                                      Radio<String>(
+                                        value: "Male",
+                                        groupValue: selectedGender,
                                         onChanged: (value) {
                                           setState(() {
-                                            isMale = value!;
+                                            selectedGender = value!;
                                           });
                                         },
                                       ),
@@ -264,12 +263,12 @@ class _UpdateUserState extends State<UpdateUser> {
                                 Expanded(
                                   child: Row(
                                     children: [
-                                      Radio<bool>(
-                                        value: false,
-                                        groupValue: isMale,
+                                      Radio<String>(
+                                        value: "Female",
+                                        groupValue: selectedGender,
                                         onChanged: (value) {
                                           setState(() {
-                                            isMale = value!;
+                                            selectedGender = value!;
                                           });
                                         },
                                       ),
@@ -321,14 +320,14 @@ class _UpdateUserState extends State<UpdateUser> {
                             }
                             List split = value.split('-');
                             int age = DateTime.now().year - int.parse(split[2]);
-                            int requiredAge = isMale ? 21 : 18;
+                            int requiredAge = selectedGender == "Male" ? 21 : 18;
                             // print(DateTime.now().year.toString());
                             if (age < requiredAge) {
                               setState(() {
                                 isValiddob = false;
                               });
                               // print("no");
-                              return 'Minimum required age is ${requiredAge} for ${isMale?'Male':'Female'}';
+                              return 'Minimum required age is ${requiredAge} for ${selectedGender}';
                             } else {
                               setState(() {
                                 isValiddob = true;
@@ -408,7 +407,7 @@ class _UpdateUserState extends State<UpdateUser> {
                                           phone: phone.text,
                                           dob: dob.text,
                                           city: city.text ?? '',
-                                          gender: isMale,
+                                          gender: selectedGender,
                                           isFav: userForUpdate['isFav'],                                          // hobbies: selectedHobbiesString,
                                           // password: password.text,
                                         );
