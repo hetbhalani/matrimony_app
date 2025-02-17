@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:matrimonial_app/abotUs.dart';
 import 'package:matrimonial_app/db.dart';
 import 'package:matrimonial_app/favUser.dart';
 import 'package:matrimonial_app/home.dart';
@@ -6,10 +7,8 @@ import 'package:matrimonial_app/updateForm.dart';
 import 'package:matrimonial_app/user.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
-import 'abotUs.dart';
-// import 'package:line_icons/line_icons.dart';
 
-Map<String,dynamic> userForUpdate = {};
+Map<String, dynamic> userForUpdate = {};
 
 class Userlist extends StatefulWidget {
   const Userlist({super.key});
@@ -29,7 +28,7 @@ class _UserlistState extends State<Userlist> {
     Center(child: Text('Favorites')),
   ];
   static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.w600);
+  TextStyle(fontSize: 30, fontWeight: FontWeight.w600);
 
   static const List<Widget> _widgetOptions = <Widget>[
     Text(
@@ -53,20 +52,18 @@ class _UserlistState extends State<Userlist> {
   List<Map<String, dynamic>> searchedUsers = [];
   List<Map<String, dynamic>> allUsers = [];
 
-
+  @override
   void initState() {
     super.initState();
     loadUsers();
   }
 
-  void loadUsers(){
-    Future<void> loadUsers() async {
-      final users = await db.fetchUsers();
-      setState(() {
-        allUsers = users;
-        searchedUsers = List.from(users);
-      });
-    }
+  Future<void> loadUsers() async {
+    final users = await db.fetchUsers();
+    setState(() {
+      allUsers = users;
+      searchedUsers = List.from(users);
+    });
   }
 
   void filterUsers(String query) {
@@ -99,7 +96,7 @@ class _UserlistState extends State<Userlist> {
             const Text(
               "JanmoKeSathi",
               style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
             ),
           ],
         ),
@@ -111,9 +108,7 @@ class _UserlistState extends State<Userlist> {
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
             child: TextFormField(
               controller: search,
-              onChanged: (value) {
-                filterUsers(value);
-              },
+              onChanged: filterUsers,
               decoration: InputDecoration(
                   labelText: "Search",
                   prefixIcon: Icon(Icons.search),
@@ -125,9 +120,12 @@ class _UserlistState extends State<Userlist> {
             height: 10,
           ),
           Expanded(
-            child: ListView.builder(
+            child: searchedUsers.isEmpty
+                ? Center(child: Text('No users found'))
+                : ListView.builder(
               itemCount: searchedUsers.length,
               itemBuilder: (context, index) {
+                final user = searchedUsers[index];
                 return Center(
                   child: Container(
                     width: MediaQuery.of(context).size.width * 0.9,
@@ -141,25 +139,27 @@ class _UserlistState extends State<Userlist> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(
                                       20)), // Rounded Corners
-                              contentPadding:
-                                  EdgeInsets.all(20), // Padding for neat UI
+                              contentPadding: EdgeInsets.all(
+                                  20), // Padding for neat UI
                               content: Container(
-                                width: MediaQuery.of(context).size.width * 0.8,
+                                width: MediaQuery.of(context).size.width *
+                                    0.8,
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.center,
                                   children: [
                                     CircleAvatar(
                                       radius: 50,
                                       backgroundImage: AssetImage(
-                                        searchedUsers[index]['gender']
+                                        user['gender'] == "Male"
                                             ? 'assets/imgs/male.png'
                                             : 'assets/imgs/female.png',
                                       ),
                                     ),
                                     SizedBox(height: 15),
                                     Text(
-                                      searchedUsers[index]['name'],
+                                      user['name'],
                                       style: TextStyle(
                                           fontSize: 22,
                                           fontWeight: FontWeight.bold),
@@ -171,39 +171,43 @@ class _UserlistState extends State<Userlist> {
                                       alignment: Alignment.centerLeft,
                                       child: Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
                                           userInfo(
                                             icon: Icons.email_outlined,
                                             label: "Email",
-                                            value: searchedUsers[index]['email'],
+                                            value: user['email'],
                                           ),
                                           userInfo(
                                             icon: Icons.phone,
                                             label: "Phone",
-                                            value: searchedUsers[index]['phone'],
+                                            value: user['phone'],
                                           ),
                                           userInfo(
                                             icon: Icons.person,
                                             label: "Gender",
-                                            value: searchedUsers[index]['gender'] ? "Male" : "Female",
+                                            value: user['gender']
                                           ),
                                           userInfo(
-                                            icon: Icons.sports_esports_outlined,
+                                            icon: Icons
+                                                .sports_esports_outlined,
                                             label: "Hobbies",
-                                            value: allUsers[index]['hobbies'] != null
-                                                ? (allUsers[index]['hobbies'] as List).join(", ")
+                                            value: user['hobbies'] != null
+                                                ? (user['hobbies'] as List)
+                                                .join(", ")
                                                 : "No hobbies",
                                           ),
                                           userInfo(
-                                            icon: Icons.location_city_outlined,
+                                            icon: Icons
+                                                .location_city_outlined,
                                             label: "City",
-                                            value: searchedUsers[index]['city'],
+                                            value: user['city'],
                                           ),
                                           userInfo(
                                             icon: Icons.cake_rounded,
                                             label: "Age",
-                                            value: "${calcAge(searchedUsers[index]['dob'])} Years",
+                                            value:
+                                            "${calcAge(user['dob'])} Years",
                                           )
                                         ],
                                       ),
@@ -213,10 +217,12 @@ class _UserlistState extends State<Userlist> {
                               ),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.pop(context),
+                                  onPressed: () =>
+                                      Navigator.pop(context),
                                   child: Text("Close",
                                       style: TextStyle(
-                                          color: Colors.red, fontSize: 16)),
+                                          color: Colors.red,
+                                          fontSize: 16)),
                                 ),
                               ],
                             ),
@@ -226,12 +232,13 @@ class _UserlistState extends State<Userlist> {
                           title: Row(
                             children: [
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
                                 children: [
                                   Row(
                                     children: [
                                       Image.asset(
-                                        searchedUsers[index]['gender']
+                                        user['gender'] == "Male"
                                             ? 'assets/imgs/male.png'
                                             : 'assets/imgs/female.png',
                                         height: 35,
@@ -239,7 +246,7 @@ class _UserlistState extends State<Userlist> {
                                       ),
                                       SizedBox(width: 12),
                                       Text(
-                                        "${searchedUsers[index]['name']}",
+                                        "${user['name']}",
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18,
@@ -248,32 +255,34 @@ class _UserlistState extends State<Userlist> {
                                     ],
                                   ),
                                   Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(50, 0, 0, 0),
+                                    padding: const EdgeInsets.fromLTRB(
+                                        50, 0, 0, 0),
                                     child: Row(
                                       children: [
                                         Text(
                                           "City:",
                                           style: TextStyle(
-                                              fontWeight: FontWeight.w700),
+                                              fontWeight:
+                                              FontWeight.w700),
                                         ),
                                         SizedBox(width: 8),
-                                        Text(searchedUsers[index]['city']),
+                                        Text(user['city']),
                                       ],
                                     ),
                                   ),
                                   Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(50, 5, 0, 0),
+                                    padding: const EdgeInsets.fromLTRB(
+                                        50, 5, 0, 0),
                                     child: Row(
                                       children: [
                                         Text(
                                           "Phone:",
                                           style: TextStyle(
-                                              fontWeight: FontWeight.w700),
+                                              fontWeight:
+                                              FontWeight.w700),
                                         ),
                                         SizedBox(width: 10),
-                                        Text(searchedUsers[index]['phone']),
+                                        Text(user['phone']),
                                       ],
                                     ),
                                   ),
@@ -284,25 +293,18 @@ class _UserlistState extends State<Userlist> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   IconButton(
-                                    icon: searchedUsers[index]['isFav']
+                                    icon: user['isFav'] == 1
                                         ? Icon(Icons.favorite_rounded,
-                                            color: Colors.pinkAccent)
-                                        : Icon(Icons.favorite_border_rounded),
+                                        color: Colors.pinkAccent)
+                                        : Icon(
+                                        Icons.favorite_border_rounded),
                                     iconSize: 25,
-                                    onPressed: () {
-                                      setState(() {
-                                        if (!allUsers[index]['isFav']) {
-                                          FavUser.add(allUsers[index]);
-                                        } else {
-                                          FavUser.removeWhere((user) =>
-                                              user['email'] ==
-                                                  allUsers[index]['email']);
-                                        }
-                                        print(FavUser);
-                                        print("Fav btn pressed");
-                                        allUsers[index]['isFav'] =
-                                            !allUsers[index]['isFav'];
-                                      });
+                                    onPressed: () async {
+                                      await db.updateUser(
+                                        id: user['id'],
+                                        isFav: user['isFav'] == 0 ? 1 : 0,
+                                      );
+                                      loadUsers();
                                     },
                                   ),
                                   IconButton(
@@ -310,10 +312,27 @@ class _UserlistState extends State<Userlist> {
                                     iconSize: 25,
                                     color: Colors.blueAccent,
                                     onPressed: () {
-                                      print("Edit button pressed");
-                                      userForUpdate.addAll(searchedUsers[index]);
-                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>UpdateUser(userIndex: index)));
-                                      print(userForUpdate);
+                                      Map<String, dynamic> userToUpdate = {
+                                        'id': searchedUsers[index]['id'],
+                                        'name': searchedUsers[index]['name'],
+                                        'email': searchedUsers[index]['email'],
+                                        'phone': searchedUsers[index]['phone'],
+                                        'dob': searchedUsers[index]['dob'],
+                                        'city': searchedUsers[index]['city'],
+                                        'gender': searchedUsers[index]['gender'],
+                                        'hobbies': searchedUsers[index]['hobbies'],
+                                        'isFav': searchedUsers[index]['isFav'] ?? 0
+                                      };
+
+                                      userForUpdate.clear();  // Clear previous data
+                                      userForUpdate.addAll(userToUpdate);
+
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => UpdateUser(userIndex: index)
+                                          )
+                                      );
                                     },
                                   ),
                                   IconButton(
@@ -321,38 +340,71 @@ class _UserlistState extends State<Userlist> {
                                     iconSize: 25,
                                     color: Colors.red,
                                     onPressed: () {
-                                      print("Delete button pressed");
-                                      showDialog(context: context, builder: (BuildContext context){
-                                        return AlertDialog(title: Text("Are You Sure?"),actions: [
-                                          TextButton(onPressed: (){
-                                            Navigator.of(context).pop();
-                                          }, child: Text("cancle")),
-                                          TextButton(onPressed: (){
-                                            setState(() {
-                                              searchedUsers.removeAt(index);
-                                              allUsers.removeAt(index);
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                  content: Row(
-                                                    children: [
-                                                      Icon(Icons.delete_outline_rounded,
-                                                          color: Colors.red),
-                                                      SizedBox(width: 8),
-                                                      Text(
-                                                          "User Deleted successfully!"),
-                                                    ],
-                                                  ),
-                                                  backgroundColor: Colors.black87,
-                                                  behavior: SnackBarBehavior.floating,
-                                                  duration: Duration(seconds: 3),
-                                                ),
-                                              );
-                                              Navigator.of(context).pop();
-                                            });
-                                          }, child: Text("Delete",style: TextStyle(color: Colors.red),)),
-                                        ],);
-                                      });
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext
+                                          context) {
+                                            return AlertDialog(
+                                              title: Text(
+                                                  "Are You Sure?"),
+                                              actions: [
+                                                TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(
+                                                          context)
+                                                          .pop();
+                                                    },
+                                                    child:
+                                                    Text("Cancel")),
+                                                TextButton(
+                                                    onPressed: () async {
+                                                      await db
+                                                          .deleteUser(
+                                                          user[
+                                                          'id']);
+                                                      loadUsers();
+                                                      ScaffoldMessenger
+                                                          .of(context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                          content: Row(
+                                                            children: [
+                                                              Icon(
+                                                                  Icons
+                                                                      .delete_outline_rounded,
+                                                                  color: Colors
+                                                                      .red),
+                                                              SizedBox(
+                                                                  width:
+                                                                  8),
+                                                              Text(
+                                                                  "User Deleted successfully!"),
+                                                            ],
+                                                          ),
+                                                          backgroundColor:
+                                                          Colors
+                                                              .black87,
+                                                          behavior:
+                                                          SnackBarBehavior
+                                                              .floating,
+                                                          duration: Duration(
+                                                              seconds:
+                                                              3),
+                                                        ),
+                                                      );
+                                                      Navigator.of(
+                                                          context)
+                                                          .pop();
+                                                    },
+                                                    child: Text(
+                                                      "Delete",
+                                                      style: TextStyle(
+                                                          color: Colors
+                                                              .red),
+                                                    )),
+                                              ],
+                                            );
+                                          });
                                     },
                                   ),
                                 ],
@@ -415,14 +467,14 @@ class _UserlistState extends State<Userlist> {
                   onPressed: () {
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) => FavUsers()));
-                    // Navigator.of(context).push(MaterialPageRoute(builder: (context)=>FavUsers()));
                   },
                 ),
                 GButton(
                   icon: Icons.school_outlined,
                   text: 'About Us',
-                  onPressed: (){
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> AboutUs()));
+                  onPressed: () {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => AboutUs()));
                   },
                 ),
               ],
@@ -444,7 +496,8 @@ class _UserlistState extends State<Userlist> {
     return ((DateTime.now().year)) - int.parse(split[2]);
   }
 
-  Widget userInfo({required IconData icon, required String label, required String value}) {
+  Widget userInfo(
+      {required IconData icon, required String label, required String value}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
@@ -466,5 +519,4 @@ class _UserlistState extends State<Userlist> {
       ),
     );
   }
-
 }

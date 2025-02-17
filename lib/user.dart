@@ -10,37 +10,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-
-
-List<Map<String, dynamic>> users = [
-  {
-    "name": "Het Bhalani R.",
-    "email": "bhalni2@gmail.com",
-    "phone": "1234567890",
-    "dob":"01-01-2000",
-    "city":"Junagadh",
-    "gender":true,
-    "isFav":false
-  },
-  {
-    "name": "ana de AAMRAS",
-    "email": "op6@gmail.com",
-    "phone": "0987654321",
-    "dob":"05-02-2000",
-    "city":"Vadodara",
-    "gender":false,
-    "isFav":false
-  },
-  {
-    "name": "batman",
-    "email": "op7@gmail.com",
-    "phone": "0987654321",
-    "dob":"05-02-2000",
-    "city":"Vadodara",
-    "gender":true,
-    "isFav":false
-  }
-];
+List<Map<String, dynamic>> users = [];
 
 class User {
   String name;
@@ -48,8 +18,8 @@ class User {
   String phone;
   String dob;
   String city;
-  bool gender;
-  bool isFav;
+  String gender;
+  int isFav;
   List<String> hobbies;
   // String hobbies;
   // String password;
@@ -81,11 +51,11 @@ class _CrudUserState extends State<CrudUser> {
   TextEditingController phone = TextEditingController();
   TextEditingController dob = TextEditingController();
   TextEditingController city = TextEditingController();
-  // TextEditingController gender = TextEditingController();
+  TextEditingController gender = TextEditingController();
   // TextEditingController hobbies = TextEditingController();
   TextEditingController password = TextEditingController();
 
-  bool isMale = true;
+  String selectedGender = "Male";
 
   String? selectedCity;
   List<String> hobbies = ["Reading", "Traveling", "Gaming", "Cooking"];
@@ -339,7 +309,7 @@ class _CrudUserState extends State<CrudUser> {
                           height: 10,
                         ),
                         Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         "Gender",
@@ -350,12 +320,12 @@ class _CrudUserState extends State<CrudUser> {
                           Expanded(
                             child: Row(
                               children: [
-                                Radio<bool>(
-                                  value: true,
-                                  groupValue: isMale,
+                                Radio<String>(
+                                  value: "Male",
+                                  groupValue: selectedGender,
                                   onChanged: (value) {
                                     setState(() {
-                                      isMale = value!;
+                                      selectedGender = value!;
                                     });
                                   },
                                 ),
@@ -366,12 +336,12 @@ class _CrudUserState extends State<CrudUser> {
                           Expanded(
                             child: Row(
                               children: [
-                                Radio<bool>(
-                                  value: false,
-                                  groupValue: isMale,
+                                Radio<String>(
+                                  value: "Female",
+                                  groupValue: selectedGender,
                                   onChanged: (value) {
                                     setState(() {
-                                      isMale = value!;
+                                      selectedGender = value!;
                                     });
                                   },
                                 ),
@@ -414,7 +384,7 @@ class _CrudUserState extends State<CrudUser> {
                               int age = today.year - pickedDate.year;
 
                               // Check age based on gender
-                              int requiredAge = isMale ? 21 : 18;
+                              int requiredAge = selectedGender == "Male" ? 21 : 18;
 
                               if (age < requiredAge) {
                                 // Show an error dialog
@@ -422,7 +392,7 @@ class _CrudUserState extends State<CrudUser> {
                                   context: context,
                                   builder: (context) => AlertDialog(
                                     title: Text('Age Validation'),
-                                    content: Text('Minimum age is $requiredAge for ${isMale ? "Male" : "Female"}'),
+                                    content: Text('Minimum age is $requiredAge for ${selectedGender}'),
                                     actions: [
                                       TextButton(
                                         onPressed: () => Navigator.of(context).pop(),
@@ -547,26 +517,12 @@ class _CrudUserState extends State<CrudUser> {
                                           phone: phone.text,
                                           dob: dob.text,
                                           city: selectedCity ?? '',
-                                          gender: isMale,
-                                          isFav:false,
+                                          gender: selectedGender,  // changed from isMale
+                                          isFav: 0,
                                           hobbies: selectedHobbiesList,
                                           // hobbies: selectedHobbiesString,
                                           // password: password.text,
                                         );
-
-                                        // setState(() {
-                                        //   users.insert(0,{
-                                        //     'name': newUser.name,
-                                        //     'email': newUser.email,
-                                        //     'phone': newUser.phone,
-                                        //     'dob': newUser.dob,
-                                        //     'city': newUser.city,
-                                        //     'gender': newUser.gender,
-                                        //     'isFav': newUser.isFav,
-                                        //     'hobbies': newUser.hobbies,
-                                        //     // 'password': newUser.password,
-                                        //   });
-                                        // });
 
                                         await MatrimonyDB().addUser(
                                             newUser.name,
@@ -608,8 +564,8 @@ class _CrudUserState extends State<CrudUser> {
                                             duration: Duration(seconds: 3),
                                           ),
                                         );
-
                                         print(users);
+
                                       } else {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
@@ -628,7 +584,6 @@ class _CrudUserState extends State<CrudUser> {
                                             duration: Duration(seconds: 3),
                                           ),
                                         );
-                                        print(users);
                                       }
                                     },
                                     child: Text(

@@ -3,10 +3,11 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:matrimonial_app/user.dart';
 import 'package:matrimonial_app/userList.dart';
 import 'package:matrimonial_app/home.dart';
+import 'package:matrimonial_app/db.dart';
 
 import 'abotUs.dart';
 
-List<Map<String, dynamic>> FavUser = [];
+List<Map<String, dynamic>> FavUser = [];  // Used for storing the favorite users
 
 class FavUsers extends StatefulWidget {
   const FavUsers({super.key});
@@ -15,8 +16,32 @@ class FavUsers extends StatefulWidget {
   State<FavUsers> createState() => _FavUsersState();
 }
 
+List<Map<String, dynamic>> favUsers = [];
+
 class _FavUsersState extends State<FavUsers> {
   int _selectedIndex = 2;
+
+  @override
+  void initState() {
+    super.initState();
+    loadFavUsers();
+  }
+
+  Future<void> loadFavUsers() async {
+    await MatrimonyDB().fetchUsers();
+    fetchFavUsers();
+  }
+
+  Future<void> fetchFavUsers() async {
+    // Fetch the favorite users from the database
+    List<Map<String, dynamic>> data = await MatrimonyDB().getFavUsers(); // Get data from the DB
+
+    // Update the state with the fetched favorite users
+    setState(() {
+      favUsers = data;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -41,28 +66,28 @@ class _FavUsersState extends State<FavUsers> {
         ),
         backgroundColor: Color.fromRGBO(255, 48, 48, 0.8),
       ),
-
       body: Column(
         children: [
           SizedBox(height: 10), // Optional top spacing
 
           Expanded(
-            child: FavUser.isNotEmpty ? ListView.builder(
+            child: favUsers.isNotEmpty
+                ? ListView.builder(
               padding: const EdgeInsets.all(10),
-              itemCount: FavUser.length,
+              itemCount: favUsers.length,
               itemBuilder: (context, index) {
                 return _buildFavUserCard(index);
               },
-            ) : Center(
+            )
+                : Center(
               child: Text(
                 "Koi Pasand Nathi!",
-                style: TextStyle(fontSize: 20,color: Colors.grey),
+                style: TextStyle(fontSize: 20, color: Colors.grey),
               ),
             ),
           ),
         ],
       ),
-
       bottomNavigationBar: _buildBottomNav(),
     );
   }
@@ -79,7 +104,7 @@ class _FavUsersState extends State<FavUsers> {
                 Row(
                   children: [
                     Image.asset(
-                      FavUser[index]['gender']
+                      favUsers[index]['gender']
                           ? 'assets/imgs/male.png'
                           : 'assets/imgs/female.png',
                       height: 40,
@@ -87,15 +112,14 @@ class _FavUsersState extends State<FavUsers> {
                     ),
                     SizedBox(width: 10),
                     Text(
-                      "${FavUser[index]['name']}",
+                      "${favUsers[index]['name']}",
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                     ),
                   ],
                 ),
-                _buildUserInfo("City:", FavUser[index]['city']),
-                _buildUserInfo("Phone:", FavUser[index]['phone']),
-                // _buildUserInfo("Email:", FavUser[index]['email']),
-                _buildUserInfo("Gender:", FavUser[index]['gender'] ? 'Male' : 'Female',),
+                _buildUserInfo("City:", favUsers[index]['city']),
+                _buildUserInfo("Phone:", favUsers[index]['phone']),
+                _buildUserInfo("Gender:", favUsers[index]['gender'] ? 'Male' : 'Female'),
               ],
             ),
             Spacer(),
@@ -106,13 +130,11 @@ class _FavUsersState extends State<FavUsers> {
                   iconSize: 25,
                   onPressed: () {
                     setState(() {
-                      users[users.indexOf(FavUser[index])]['isFav'] =
-                      !users[users.indexOf(FavUser[index])]['isFav'];
-                      FavUser.removeAt(index);
+                      favUsers[index]['isFav'] = !favUsers[index]['isFav']; // Toggle the isFav status
+                      FavUser.removeAt(index);  // Optionally remove the item here
                     });
                   },
                 ),
-                // SizedBox(height: 40),
                 IconButton(
                   icon: Icon(Icons.edit, color: Colors.blueAccent),
                   iconSize: 25,
@@ -123,7 +145,7 @@ class _FavUsersState extends State<FavUsers> {
                   iconSize: 25,
                   onPressed: () {
                     setState(() {
-                      users.removeAt(index);
+                      favUsers.removeAt(index);
                     });
                   },
                 ),
@@ -192,8 +214,8 @@ class _FavUsersState extends State<FavUsers> {
               GButton(
                 icon: Icons.school_outlined,
                 text: 'About Us',
-                onPressed: (){
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> AboutUs()));
+                onPressed: () {
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AboutUs()));
                 },
               ),
             ],
