@@ -312,20 +312,25 @@ class _UserlistState extends State<Userlist> {
                                     iconSize: 25,
                                     color: Colors.blueAccent,
                                     onPressed: () {
-                                      Map<String, dynamic> userToUpdate = {
-                                        'id': searchedUsers[index]['id'],
-                                        'name': searchedUsers[index]['name'],
-                                        'email': searchedUsers[index]['email'],
-                                        'phone': searchedUsers[index]['phone'],
-                                        'dob': searchedUsers[index]['dob'],
-                                        'city': searchedUsers[index]['city'],
-                                        'gender': searchedUsers[index]['gender'],
-                                        'hobbies': searchedUsers[index]['hobbies'],
-                                        'isFav': searchedUsers[index]['isFav'] ?? 0
-                                      };
+                                     setState(() {
+                                       Map<String, dynamic> userForUpdate = {
+                                         'id': searchedUsers[index]['id'],
+                                         'name': searchedUsers[index]['name'],
+                                         'email': searchedUsers[index]['email'],
+                                         'phone': searchedUsers[index]['phone'],
+                                         'dob': searchedUsers[index]['dob'],
+                                         'city': searchedUsers[index]['city'],
+                                         'gender': searchedUsers[index]['gender'],
+                                         'hobbies': searchedUsers[index]['hobbies'],
+                                         'isFav': searchedUsers[index]['isFav'] ?? 0
+                                       };
+                                       // userForUpdate.addAll(userToUpdate);
 
-                                      userForUpdate.clear();  // Clear previous data
-                                      userForUpdate.addAll(userToUpdate);
+                                     });
+                                      // print('=========${userToUpdate}333333333333');
+
+                                      // userForUpdate.clear();
+                                      // print('===========++++++++++++++++++++++++++++${userForUpdate['city']}');
 
                                       Navigator.push(
                                           context,
