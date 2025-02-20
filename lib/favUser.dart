@@ -34,14 +34,12 @@ class _FavUsersState extends State<FavUsers> {
 
   Future<void> fetchFavUsers() async {
     // Fetch the favorite users from the database
-    List<Map<String, dynamic>> data = await MatrimonyDB().getFavUsers(); // Get data from the DB
-
+    List<Map<String, dynamic>> data = await MatrimonyDB().getFavUsers();
     // Update the state with the fetched favorite users
     setState(() {
       favUsers = data;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +102,7 @@ class _FavUsersState extends State<FavUsers> {
                 Row(
                   children: [
                     Image.asset(
-                      favUsers[index]['gender']
+                      favUsers[index]['gender'] == 'Male'
                           ? 'assets/imgs/male.png'
                           : 'assets/imgs/female.png',
                       height: 40,
@@ -119,7 +117,7 @@ class _FavUsersState extends State<FavUsers> {
                 ),
                 _buildUserInfo("City:", favUsers[index]['city']),
                 _buildUserInfo("Phone:", favUsers[index]['phone']),
-                _buildUserInfo("Gender:", favUsers[index]['gender'] ? 'Male' : 'Female'),
+                _buildUserInfo("Gender:", favUsers[index]['gender']),
               ],
             ),
             Spacer(),
@@ -128,25 +126,12 @@ class _FavUsersState extends State<FavUsers> {
                 IconButton(
                   icon: Icon(Icons.favorite_rounded, color: Colors.pinkAccent),
                   iconSize: 25,
-                  onPressed: () {
-                    setState(() {
-                      favUsers[index]['isFav'] = !favUsers[index]['isFav']; // Toggle the isFav status
-                      FavUser.removeAt(index);  // Optionally remove the item here
-                    });
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.edit, color: Colors.blueAccent),
-                  iconSize: 25,
-                  onPressed: () => print("Edit button pressed"),
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete, color: Colors.red),
-                  iconSize: 25,
-                  onPressed: () {
-                    setState(() {
-                      favUsers.removeAt(index);
-                    });
+                  onPressed: () async {
+                    int userId = favUsers[index]['id'];
+                    int newFav = favUsers[index]['isFav'] == 1 ? 0 : 1;
+                    await MatrimonyDB().updateUser(id: userId, isFav: newFav);
+                    fetchFavUsers();
+                    print("Hello");
                   },
                 ),
               ],

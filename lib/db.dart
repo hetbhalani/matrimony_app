@@ -1,14 +1,17 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+List<Map<String, dynamic>> users = [];
+
 class MatrimonyDB{
+
   Future<Database> initDatabase() async {
     Database db1 = await openDatabase(
         join(await getDatabasesPath(), 'users.db'),
         version: 1,
         onCreate: (db, version) {
       return db.execute(
-        "CREATE TABLE USER(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,email TEXT,phone TEXT,dob TEXT,city TEXT,gender INTEGER,hobbies TEXT, isFav INTEGER)"
+        "CREATE TABLE USER(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,email TEXT,phone TEXT,dob TEXT,city TEXT,gender TEXT,hobbies TEXT, isFav INTEGER)"
       );
     });
     return db1;
@@ -21,7 +24,7 @@ class MatrimonyDB{
 
   Future<List<Map<String, dynamic>>> fetchUsers() async {
     Database db = await initDatabase();
-    List<Map<String, dynamic>> users = await db.query('USER');
+   users = await db.query('USER');
 
     return users.map((user) => {
       'id': user['id'],
@@ -78,6 +81,6 @@ class MatrimonyDB{
 
   Future<List<Map<String, dynamic>>> getFavUsers() async {
     final db = await initDatabase();
-    return await db.query('users', where: 'isFav = ?', whereArgs: [1]);
+    return await db.query('USER', where: 'isFav = ?', whereArgs: [1]);
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:matrimonial_app/db.dart';
 import 'package:matrimonial_app/favUser.dart';
 import 'package:matrimonial_app/home.dart';
 import 'package:matrimonial_app/user.dart';
@@ -40,7 +41,8 @@ class UpdateUser extends StatefulWidget {
 }
 
 class _UpdateUserState extends State<UpdateUser> {
-  @override
+
+  // String? selectedCity = userForUpdate['city'].toString();
   TextEditingController name = TextEditingController(text: userForUpdate['name'].toString());
   TextEditingController email = TextEditingController(text: userForUpdate['email'].toString());
   TextEditingController phone = TextEditingController(text: userForUpdate['phone'].toString());
@@ -49,11 +51,11 @@ class _UpdateUserState extends State<UpdateUser> {
   TextEditingController gender = TextEditingController(text: userForUpdate['gender'].toString());
   TextEditingController isFav = TextEditingController(text: userForUpdate['isFav'].toString());
   String selectedGender = userForUpdate['gender'].toString();
+  // String? selectedCity;
+  // dedicated variable for dropdown value
   // TextEditingController hobbies = TextEditingController();
   // TextEditingController password = TextEditingController(text: userForUpdate['password'].toString());
 
-
-  String? selectedCity;
   List<String> cities = [
     'Junagadh',
     'Rajkot',
@@ -72,25 +74,36 @@ class _UpdateUserState extends State<UpdateUser> {
 
   GlobalKey<FormState> fk = GlobalKey();
   int _selectedIndex = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers from userForUpdate
+    // selectedCity = userForUpdate['city'].toString();
+    // city.text = selectedCity!;
+    print('-----------------------${city.text}-----------------------------');
+    // ... initialize other controllers
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Image.asset(
-              'assets/imgs/logo.png',
-              height: 35,
-              fit: BoxFit.contain,
-            ),
-            SizedBox(width: 10,),
-            const Text(
-              "JanmoKeSathi",
-              style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
-            ),
-          ],
-        ),
-        backgroundColor: Color.fromRGBO(255, 34, 34, 0.8)
+          title: Row(
+            children: [
+              Image.asset(
+                'assets/imgs/logo.png',
+                height: 35,
+                fit: BoxFit.contain,
+              ),
+              SizedBox(width: 10,),
+              const Text(
+                "JanmoKeSathi",
+                style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
+              ),
+            ],
+          ),
+          backgroundColor: Color.fromRGBO(255, 34, 34, 0.8)
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -343,7 +356,7 @@ class _UpdateUserState extends State<UpdateUser> {
                           height: 30,
                         ),
                         DropdownButtonFormField<String>(
-                          value: city.text,
+                          value: city.text??'Rajkot',
                           focusColor: Colors.transparent,
                           decoration: InputDecoration(
                             labelText: "Select Your City",
@@ -355,14 +368,15 @@ class _UpdateUserState extends State<UpdateUser> {
                             ),
                           ),
                           items: cities
-                              .map<DropdownMenuItem<String>>((String city1) {
+                              .map<DropdownMenuItem<String>>((String cityValue) {
                             return DropdownMenuItem<String>(
-                              value: city1,
-                              child: Text(city1),
+                              value: cityValue,
+                              child: Text(cityValue),
                             );
                           }).toList(),
                           onChanged: (String? newValue) {
                             setState(() {
+                              // selectedCity = newValue;
                               city.text = newValue!;
                             });
                           },
@@ -399,71 +413,51 @@ class _UpdateUserState extends State<UpdateUser> {
                                             12), // Match gradient corners
                                       ),
                                     ),
-                                    onPressed: () {
+                                    onPressed: () async {
                                       if (fk.currentState!.validate()) {
                                         User newUser = User(
                                           name: name.text,
                                           email: email.text,
                                           phone: phone.text,
                                           dob: dob.text,
-                                          city: city.text ?? '',
+                                          city: city.text,
                                           gender: selectedGender,
                                           isFav: userForUpdate['isFav'],                                          // hobbies: selectedHobbiesString,
                                           // password: password.text,
                                         );
-                                        setState(() {
-                                          users[widget.userIndex] = {
-                                            'name': newUser.name,
-                                            'email': newUser.email,
-                                            'phone': newUser.phone,
-                                            'dob': newUser.dob,
-                                            'city': newUser.city,
-                                            'gender': newUser.gender,
-                                            'isFav': newUser.isFav,
-                                          };
-                                        });
+                                        // Call the DB update method instead of updating a local list.
+                                        await MatrimonyDB().updateUser(
+                                          id: userForUpdate['id'],
+                                          name: newUser.name,
+                                          email: newUser.email,
+                                          phone: newUser.phone,
+                                          dob: newUser.dob,
+                                          city: newUser.city,
+                                          gender: newUser.gender,
+                                          isFav: newUser.isFav,
+                                        );
+                                        // Clear controllers if needed and show confirmation
                                         name.clear();
                                         email.clear();
                                         phone.clear();
                                         dob.clear();
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                        ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(
-                                            content: Row(
-                                              children: [
-                                                Icon(Icons.check_circle,
-                                                    color: Colors.green),
-                                                SizedBox(width: 8),
-                                                Text(
-                                                    "User Updated successfully!"),
-                                              ],
-                                            ),
-                                            backgroundColor: Colors.black87,
-                                            behavior: SnackBarBehavior.floating,
+                                            content: Text("User Updated successfully!"),
                                             duration: Duration(seconds: 3),
                                           ),
                                         );
-                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>Userlist()));
-                                        print(users);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => Userlist()),
+                                        );
                                       } else {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                        ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(
-                                            content: Row(
-                                              children: [
-                                                Icon(Icons.cancel_outlined,
-                                                    color: Colors.red),
-                                                SizedBox(width: 8),
-                                                Text(
-                                                    "Please fill all fields correctly"),
-                                              ],
-                                            ),
-                                            backgroundColor: Colors.black87,
-                                            behavior: SnackBarBehavior.floating,
+                                            content: Text("Please fill all fields correctly"),
                                             duration: Duration(seconds: 3),
                                           ),
                                         );
-                                        print(users);
                                       }
                                     },
                                     child: Text(

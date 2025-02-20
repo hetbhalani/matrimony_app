@@ -10,7 +10,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-List<Map<String, dynamic>> users = [];
+// List<Map<String, dynamic>> users = [];
 
 class User {
   String name;
@@ -273,8 +273,10 @@ class _CrudUserState extends State<CrudUser> {
                         ),
                         TextFormField(
                           controller: phone,
+                          keyboardType: TextInputType.number,
                           maxLength: 10,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],                          decoration: InputDecoration(
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          decoration: InputDecoration(
                             labelText: "Mobile Number",
                             prefixIcon: Icon(Icons.phone,
                                 color:
