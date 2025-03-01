@@ -11,12 +11,11 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   var emailController = TextEditingController();
-  var nameVal = 'No data';
 
   @override
   void initState() {
     super.initState();
-    getPref();
+    checkLoginStatus();
   }
 
   @override
@@ -67,14 +66,24 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () async {
                 print("Login Pressed");
 
-                var email = emailController.text.toString();
-                var pref = await SharedPreferences.getInstance();
-
-                bool success = await pref.setString("email", email);
-                if (success) {
-                  print("Email saved successfully");
+                var email = emailController.text.trim();
+                if (email.toLowerCase() == "hetbhai") {
+                  var pref = await SharedPreferences.getInstance();
+                  bool success = await pref.setString("email", email);
+                  if (success) {
+                    print("Email saved successfully");
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
+                  } else {
+                    print("Failed to save email");
+                  }
                 } else {
-                  print("Failed to save email");
+                  // Show error for wrong email
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Invalid email address!"))
+                  );
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -98,53 +107,16 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void getPref() async {
+  // Check if the user is already logged in
+  void checkLoginStatus() async {
     var pref = await SharedPreferences.getInstance();
-    var prefName = pref.getString("email") ?? "No data";
+    var prefEmail = pref.getString("email");
 
-    setState(() {
-
-    });
-
-    if (prefName == "hetbhaiop") {
-
-      print("done");
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(),));
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.check_circle,
-                  color: Colors.green),
-              SizedBox(width: 8),
-              Text(
-                  "Login successfully!"),
-            ],
-          ),
-          backgroundColor: Colors.black87,
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 3),
-        ),
-      );
-    } else {
-      print("nathi");
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.cancel_outlined,
-                  color: Colors.red),
-              SizedBox(width: 8),
-              Text(
-                  "Enter correct email"),
-            ],
-          ),
-          backgroundColor: Colors.black87,
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 3),
-        ),
+    if (prefEmail != null && prefEmail.isNotEmpty) {
+      // If email exists in SharedPreferences, navigate to HomePage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
       );
     }
   }

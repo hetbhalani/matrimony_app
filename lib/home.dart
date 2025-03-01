@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:matrimonial_app/PageViewBuilder.dart';
 import 'package:matrimonial_app/UserList.dart';
 import 'package:matrimonial_app/abotUs.dart';
 import 'package:matrimonial_app/favUser.dart';
+import 'package:matrimonial_app/loginScreen.dart';
 import 'dart:ui';
 
 import 'package:matrimonial_app/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,7 +29,7 @@ class _HomePageState extends State<HomePage> {
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.all(16.0),
-            backgroundColor: Color.fromRGBO(250, 198, 122,1),
+            backgroundColor: Color.fromRGBO(250, 198, 122, 1),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(20)),
             ),
@@ -43,7 +46,6 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
-
           children: [
             Image.asset(
               'assets/imgs/logo.png',
@@ -51,36 +53,33 @@ class _HomePageState extends State<HomePage> {
               fit: BoxFit.contain,
               // alignment: Alignment.topLeft,
             ),
-            SizedBox(width: 10,),
+            SizedBox(
+              width: 10,
+            ),
             const Text(
               "JanmoKeSathi",
-              style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
             ),
+            Spacer(),
+            IconButton(
+              onPressed: () async {
+                var pref = await SharedPreferences.getInstance();
+                await pref.remove("email");
+                print("Logout");
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              },
+              icon: Icon(Icons.logout, color: Colors.white, size: 25),
+            )
           ],
         ),
         backgroundColor: Color.fromRGBO(255, 34, 34, 0.8),
-        // flexibleSpace: Container(
-        //   decoration: BoxDecoration(
-        //     gradient: LinearGradient(
-        //       colors: [
-        //         Color.fromRGBO(188, 18, 238, 0.5),
-        //         Color.fromRGBO(255, 100, 200, 0.5),
-        //       ],
-        //       begin: Alignment.topLeft,
-        //       end: Alignment.bottomRight,
-        //     ),
-        //   ),
-        // ),
-
       ),
       body: Container(
-        // decoration: const BoxDecoration(
-        //   image: DecorationImage(
-        //     image: AssetImage('assets/imgs/bg1.png'),
-        //     fit: BoxFit.cover,
-        //   ),
-        // ),
-        color: Color.fromRGBO(249, 230, 207,1),
+        color: Color.fromRGBO(249, 230, 207, 1),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -90,8 +89,10 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   _buildBlurredButton(
                     onPressed: () {
-                      print('Button 1 pressed!');
-                      Navigator.pushReplacement(context,  MaterialPageRoute(builder: (context) => CrudUser()));
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Pageviewbuilder(initialIndex: 0)),
+                      );
                     },
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -112,8 +113,7 @@ class _HomePageState extends State<HomePage> {
                           style: TextStyle(
                               fontSize: 16,
                               color: Colors.black,
-                              fontWeight: FontWeight.bold
-                          ),
+                              fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -121,8 +121,10 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(width: 20),
                   _buildBlurredButton(
                     onPressed: () {
-                      print('Button 2 pressed');
-                      Navigator.pushReplacement(context,  MaterialPageRoute(builder: (context) => Userlist()));
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Pageviewbuilder(initialIndex: 1)),
+                      );
                     },
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -143,8 +145,7 @@ class _HomePageState extends State<HomePage> {
                           style: TextStyle(
                               fontSize: 16,
                               color: Colors.black,
-                              fontWeight: FontWeight.bold
-                          ),
+                              fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -157,8 +158,10 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   _buildBlurredButton(
                     onPressed: () {
-                      print('Button 3 pressed!');
-                      Navigator.pushReplacement(context,  MaterialPageRoute(builder: (context) => FavUsers()));
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Pageviewbuilder(initialIndex: 2)),
+                      );
                     },
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -188,8 +191,10 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(width: 20),
                   _buildBlurredButton(
                     onPressed: () {
-                      print('Button 4 pressed');
-                      Navigator.pushReplacement(context,  MaterialPageRoute(builder: (context) => AboutUs()));
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Pageviewbuilder(initialIndex: 3)),
+                      );
                     },
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
