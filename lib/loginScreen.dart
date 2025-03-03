@@ -47,9 +47,10 @@ class _LoginPageState extends State<LoginPage> {
               "JanmoKeSathi",
               style: TextStyle(fontSize: 35, fontFamily: "titleFont", fontWeight: FontWeight.bold),
             ),
+
             const SizedBox(height: 20),
             SizedBox(
-              width: 400,
+              width: 370,
               child: TextFormField(
                 controller: emailController,
                 decoration: const InputDecoration(
@@ -80,7 +81,6 @@ class _LoginPageState extends State<LoginPage> {
                     print("Failed to save email");
                   }
                 } else {
-                  // Show error for wrong email
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Invalid email address!"))
                   );
@@ -107,13 +107,11 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Check if the user is already logged in
   void checkLoginStatus() async {
     var pref = await SharedPreferences.getInstance();
     var prefEmail = pref.getString("email");
 
     if (prefEmail != null && prefEmail.isNotEmpty) {
-      // If email exists in SharedPreferences, navigate to HomePage
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
