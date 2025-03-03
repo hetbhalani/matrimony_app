@@ -7,7 +7,7 @@ import 'package:matrimonial_app/updateForm.dart';
 import 'package:matrimonial_app/user.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
-Map<String, dynamic> userForUpdate = {};
+// Map<String, dynamic> userForUpdate = {};
 
 class Userlist extends StatefulWidget {
   const Userlist({super.key});
@@ -82,31 +82,14 @@ class _UserlistState extends State<Userlist> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Image.asset(
-              'assets/imgs/logo.png',
-              height: 35,
-              fit: BoxFit.contain,
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            const Text(
-              "JanmoKeSathi",
-              style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-          ],
-        ),
-        backgroundColor: Color.fromRGBO(255, 48, 48, 0.8),
-      ),
+      backgroundColor: Color(0xfff6f0ff),
+
       body: Column(
         children: [
           Row(
             children: [
-              Expanded(
+              SizedBox(
+                width: 300,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 10, 0, 10),
                   child: TextFormField(
@@ -126,40 +109,49 @@ class _UserlistState extends State<Userlist> {
                 width: 10,
               ),
               DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  hint:  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 7, 0),
-                    child: Row(
-                      children: [
-                        Text("Sort", style: TextStyle(fontSize: 18)),
-                        SizedBox(width: 5),
-                        Icon(Icons.filter_list, size: 23),
-                      ],
+                child: Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                  child: DropdownButton<String>(
+                    hint: SizedBox(
+                      width: 72,
+                      child: Row(
+                        children: [
+                          SizedBox(width: 3),
+                          Text("Sort", style: TextStyle(fontSize: 18)),
+                          SizedBox(width: 5),
+                          Icon(Icons.filter_list, size: 23),
+                        ],
+                      ),
                     ),
+                    items: [
+                      DropdownMenuItem(
+                        value: "A to Z",
+                        child: Text("A to Z"),
+                      ),
+                      DropdownMenuItem(
+                        value: "Z to A",
+                        child: Text("Z to A"),
+                      ),
+                      DropdownMenuItem(
+                        value: "by City",
+                        child: Text("by City"),
+                      ),
+                      DropdownMenuItem(
+                        value: "by Age",
+                        child: Text("by Age"),
+                      ),
+                    ],
+                    icon: SizedBox.shrink(),
+                    onChanged: (String? val) {
+                      print("selected:$val");
+                      print(sortItems(val));
+                    },
                   ),
-                  items: [
-                    DropdownMenuItem(
-                      value: "A to Z",
-                      child: Text("A to Z"),
-                    ),
-                    DropdownMenuItem(
-                      value: "Z to A",
-                      child: Text("Z to A"),
-                    ),
-                    DropdownMenuItem(
-                      value: "by City",
-                      child: Text("by City"),
-                    ),
-                    DropdownMenuItem(
-                      value: "by Age",
-                      child: Text("by Age"),
-                    ),
-                  ],
-                  icon: SizedBox.shrink(),
-                  onChanged: (String? val) {
-                    print("selected:$val");
-                    print(sortItems(val));
-                  },
                 ),
               )
             ],
@@ -359,42 +351,12 @@ class _UserlistState extends State<Userlist> {
                                           iconSize: 25,
                                           color: Colors.blueAccent,
                                           onPressed: () {
-                                            setState(() {
-                                              Map<String, dynamic>
-                                                  userForUpdate = {
-                                                'id': searchedUsers[index]
-                                                    ['id'],
-                                                'name': searchedUsers[index]
-                                                    ['name'],
-                                                'email': searchedUsers[index]
-                                                    ['email'],
-                                                'phone': searchedUsers[index]
-                                                    ['phone'],
-                                                'dob': searchedUsers[index]
-                                                    ['dob'],
-                                                'city': searchedUsers[index]
-                                                    ['city'],
-                                                'gender': searchedUsers[index]
-                                                    ['gender'],
-                                                'hobbies': searchedUsers[index]
-                                                    ['hobbies'],
-                                                'isFav': searchedUsers[index]
-                                                        ['isFav'] ??
-                                                    0
-                                              };
-                                              // userForUpdate.addAll(userToUpdate);
-                                            });
-                                            // print('=========${userToUpdate}333333333333');
-
-                                            // userForUpdate.clear();
-                                            // print('===========++++++++++++++++++++++++++++${userForUpdate['city']}');
-
                                             Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        UpdateUser(
-                                                            userIndex: index)));
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => UpdateUser(user: searchedUsers[index]),
+                                              ),
+                                            );
                                           },
                                         ),
                                         IconButton(
@@ -482,73 +444,6 @@ class _UserlistState extends State<Userlist> {
           ),
         ],
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 20,
-              color: Colors.black.withOpacity(.1),
-            )
-          ],
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
-            child: GNav(
-              rippleColor: Colors.grey[300]!,
-              hoverColor: Colors.grey[100]!,
-              gap: 8,
-              activeColor: Colors.black,
-              iconSize: 24,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              duration: Duration(milliseconds: 400),
-              tabBackgroundColor: Colors.grey[100]!,
-              color: Colors.black,
-              tabs: [
-                GButton(
-                  icon: Icons.add_box_outlined,
-                  text: 'Add User',
-                  onPressed: () {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => CrudUser()));
-                  },
-                ),
-                GButton(
-                  icon: Icons.list_alt_rounded,
-                  text: 'User List',
-                  onPressed: () {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => Userlist()));
-                  },
-                ),
-                GButton(
-                  icon: Icons.favorite_border_rounded,
-                  text: 'Favorite',
-                  onPressed: () {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => FavUsers()));
-                  },
-                ),
-                GButton(
-                  icon: Icons.school_outlined,
-                  text: 'About Us',
-                  onPressed: () {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => AboutUs()));
-                  },
-                ),
-              ],
-              selectedIndex: _selectedIndex,
-              onTabChange: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -581,17 +476,22 @@ class _UserlistState extends State<Userlist> {
     );
   }
 
-  List<Map<String, dynamic>> sortItems(String? selectedValue){
+  List<Map<String, dynamic>> sortItems(String? selectedValue) {
     List<Map<String, dynamic>> sortedList = List.from(searchedUsers);
     setState(() {
       if (selectedValue == "A to Z") {
         searchedUsers.sort((a, b) => a['name'].compareTo(b['name']));
-      } else if (selectedValue == "Z to A") {
+      }
+      else if (selectedValue == "Z to A") {
         searchedUsers.sort((a, b) => b['name'].compareTo(a['name']));
-      } else if (selectedValue == "by Name") {
-        searchedUsers.sort((a, b) => a['city'].toLowerCase().compareTo(b['city'].toLowerCase()));
-      } else if (selectedValue == "by Age") {
-        searchedUsers.sort((a, b) => calcAge(a['dob']).compareTo(calcAge(b['dob'])));
+      }
+      else if (selectedValue == "by City") {
+        searchedUsers.sort((a, b) =>
+            a['city'].toLowerCase().compareTo(b['city'].toLowerCase()));
+      }
+      else if (selectedValue == "by Age") {
+        searchedUsers
+            .sort((a, b) => calcAge(a['dob']).compareTo(calcAge(b['dob'])));
       }
       sortedUser = sortedList;
     });
