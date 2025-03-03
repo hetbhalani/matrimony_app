@@ -33,28 +33,22 @@ class User {
 }
 
 class UpdateUser extends StatefulWidget {
-  final int userIndex;
-  const UpdateUser({super.key,required this.userIndex});
+  final Map<String, dynamic> user;
+  const UpdateUser({super.key, required this.user}); //searched user mathi j index aave e
 
   @override
   State<UpdateUser> createState() => _UpdateUserState();
 }
 
 class _UpdateUserState extends State<UpdateUser> {
-
-  // String? selectedCity = userForUpdate['city'].toString();
-  TextEditingController name = TextEditingController(text: userForUpdate['name'].toString());
-  TextEditingController email = TextEditingController(text: userForUpdate['email'].toString());
-  TextEditingController phone = TextEditingController(text: userForUpdate['phone'].toString());
-  TextEditingController dob = TextEditingController(text: userForUpdate['dob'].toString());
-  TextEditingController city = TextEditingController(text: userForUpdate['city'].toString());
-  TextEditingController gender = TextEditingController(text: userForUpdate['gender'].toString());
-  TextEditingController isFav = TextEditingController(text: userForUpdate['isFav'].toString());
-  String selectedGender = userForUpdate['gender'].toString();
-  // String? selectedCity;
-  // dedicated variable for dropdown value
-  // TextEditingController hobbies = TextEditingController();
-  // TextEditingController password = TextEditingController(text: userForUpdate['password'].toString());
+  late TextEditingController name;
+  late TextEditingController email;
+  late TextEditingController phone;
+  late TextEditingController dob;
+  late TextEditingController city;
+  late TextEditingController gender;
+  late TextEditingController isFav;
+  String selectedGender = "";
 
   List<String> cities = [
     'Junagadh',
@@ -78,11 +72,15 @@ class _UpdateUserState extends State<UpdateUser> {
   @override
   void initState() {
     super.initState();
-    // Initialize controllers from userForUpdate
-    // selectedCity = userForUpdate['city'].toString();
-    // city.text = selectedCity!;
-    print('-----------------------${city.text}-----------------------------');
-    // ... initialize other controllers
+    name = TextEditingController(text: widget.user['name'].toString());
+    email = TextEditingController(text: widget.user['email'].toString());
+    phone = TextEditingController(text: widget.user['phone'].toString());
+    dob = TextEditingController(text: widget.user['dob'].toString());
+    city = TextEditingController(text: widget.user['city'].toString());
+    gender = TextEditingController(text: widget.user['gender'].toString());
+    isFav = TextEditingController(text: widget.user['isFav'].toString());
+    selectedGender = widget.user['gender'].toString();
+    print("======================update vada use ni city ${widget.user['city']} =================================");
   }
 
   @override
@@ -214,7 +212,8 @@ class _UpdateUserState extends State<UpdateUser> {
                         TextFormField(
                           controller: phone,
                           maxLength: 10,
-                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],                          decoration: InputDecoration(
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          decoration: InputDecoration(
                           labelText: "Mobile Number",
                           prefixIcon: Icon(Icons.phone,
                               color:
@@ -310,11 +309,10 @@ class _UpdateUserState extends State<UpdateUser> {
                             ),
                           ),
                           onTap: () async {
-                            // Open the date picker when tapped
                             DateTime? pickedDate = await showDatePicker(
                               context: context,
                               initialDate: DateTime.now(),
-                              firstDate: DateTime(1900),
+                              firstDate: DateTime(DateTime.now().year - 22),
                               lastDate: DateTime.now(),
                             );
 
@@ -422,12 +420,12 @@ class _UpdateUserState extends State<UpdateUser> {
                                           dob: dob.text,
                                           city: city.text,
                                           gender: selectedGender,
-                                          isFav: userForUpdate['isFav'],                                          // hobbies: selectedHobbiesString,
+                                          isFav: widget.user['isFav'],                                          // hobbies: selectedHobbiesString,
                                           // password: password.text,
                                         );
                                         // Call the DB update method instead of updating a local list.
                                         await MatrimonyDB().updateUser(
-                                          id: userForUpdate['id'],
+                                          id: widget.user['id'],
                                           name: newUser.name,
                                           email: newUser.email,
                                           phone: newUser.phone,
