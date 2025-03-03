@@ -5,6 +5,7 @@ import 'package:matrimonial_app/UserList.dart';
 import 'package:matrimonial_app/favUser.dart';
 import 'package:matrimonial_app/user.dart';
 
+
 class AboutUs extends StatefulWidget {
   @override
   State<AboutUs> createState() => _AboutUsState();
@@ -16,23 +17,6 @@ class _AboutUsState extends State<AboutUs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          title: Row(
-            children: [
-              // Image.asset(
-              //   'assets/imgs/logo.png',
-              //   height: 35,
-              //   fit: BoxFit.contain,
-              // ),
-              SizedBox(width: 10,),
-              const Text(
-                "About Us",
-                style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),
-              ),
-            ],
-          ),
-          backgroundColor: Color.fromRGBO(255, 34, 34, 0.8)
-      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -84,73 +68,6 @@ class _AboutUsState extends State<AboutUs> {
               Text("© 2025 Darshan University", style: TextStyle(color: Colors.grey)),
               Text("Made with ❤️ in India", style: TextStyle(color: Colors.grey)),
             ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 20,
-              color: Colors.black.withOpacity(.1),
-            )
-          ],
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8),
-            child: GNav(
-              rippleColor: Colors.grey[300]!,
-              hoverColor: Colors.grey[100]!,
-              gap: 8,
-              activeColor: Colors.black,
-              iconSize: 24,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              duration: Duration(milliseconds: 400),
-              tabBackgroundColor: Colors.grey[100]!,
-              color: Colors.black,
-              tabs: [
-                GButton(
-                  icon: Icons.add_box_outlined,
-                  text: 'Add User',
-                  onPressed: () {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => CrudUser()));
-                  },
-                ),
-                GButton(
-                  icon: Icons.list_alt_rounded,
-                  text: 'User List',
-                  onPressed: () {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => Userlist()));
-                  },
-                ),
-                GButton(
-                  icon: Icons.favorite_border_rounded,
-                  text: 'Favorite',
-                  onPressed: () {
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => FavUsers()));
-                    // Navigator.of(context).push(MaterialPageRoute(builder: (context)=>FavUsers()));
-                  },
-                ),
-                GButton(
-                  icon: Icons.school_outlined,
-                  text: 'About Us',
-                  onPressed: (){
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> AboutUs()));
-                  },
-                ),
-              ],
-              selectedIndex: _selectedIndex,
-              onTabChange: (index) {
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-            ),
           ),
         ),
       ),

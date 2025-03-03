@@ -33,9 +33,7 @@ class _FavUsersState extends State<FavUsers> {
   }
 
   Future<void> fetchFavUsers() async {
-    // Fetch the favorite users from the database
     List<Map<String, dynamic>> data = await MatrimonyDB().getFavUsers();
-    // Update the state with the fetched favorite users
     setState(() {
       favUsers = data;
     });
@@ -44,30 +42,10 @@ class _FavUsersState extends State<FavUsers> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Image.asset(
-              'assets/imgs/logo.png',
-              height: 35,
-              fit: BoxFit.contain,
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            const Text(
-              "JanmoKeSathi",
-              style:
-              TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-          ],
-        ),
-        backgroundColor: Color.fromRGBO(255, 48, 48, 0.8),
-      ),
+      backgroundColor: Color(0xfff6f0ff),
       body: Column(
         children: [
-          SizedBox(height: 10), // Optional top spacing
-
+          SizedBox(height: 10),
           Expanded(
             child: favUsers.isNotEmpty
                 ? ListView.builder(
@@ -86,7 +64,6 @@ class _FavUsersState extends State<FavUsers> {
           ),
         ],
       ),
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
@@ -155,64 +132,4 @@ class _FavUsersState extends State<FavUsers> {
     );
   }
 
-  Widget _buildBottomNav() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(blurRadius: 20, color: Colors.black.withOpacity(.1))],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 8),
-          child: GNav(
-            rippleColor: Colors.grey[300]!,
-            hoverColor: Colors.grey[100]!,
-            gap: 8,
-            activeColor: Colors.black,
-            iconSize: 24,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            duration: Duration(milliseconds: 400),
-            tabBackgroundColor: Colors.grey[100]!,
-            color: Colors.black,
-            tabs: [
-              GButton(
-                icon: Icons.add_box_outlined,
-                text: 'Add User',
-                onPressed: () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => CrudUser()));
-                },
-              ),
-              GButton(
-                icon: Icons.list_alt_rounded,
-                text: 'User List',
-                onPressed: () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Userlist()));
-                },
-              ),
-              GButton(
-                icon: Icons.favorite_border_rounded,
-                text: 'Favorite',
-                onPressed: () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => FavUsers()));
-                },
-              ),
-              GButton(
-                icon: Icons.school_outlined,
-                text: 'About Us',
-                onPressed: () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AboutUs()));
-                },
-              ),
-            ],
-            selectedIndex: _selectedIndex,
-            onTabChange: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-          ),
-        ),
-      ),
-    );
-  }
 }
