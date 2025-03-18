@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:matrimonial_app/crudAPI.dart';
 import 'package:matrimonial_app/user.dart';
 import 'package:matrimonial_app/userList.dart';
 import 'package:matrimonial_app/home.dart';
-import 'package:matrimonial_app/db.dart';
-
 import 'abotUs.dart';
 
-List<Map<String, dynamic>> FavUser = [];  // Used for storing the favorite users
+List<Map<String, dynamic>> favUsers = [];
 
 class FavUsers extends StatefulWidget {
   const FavUsers({super.key});
@@ -15,8 +14,6 @@ class FavUsers extends StatefulWidget {
   @override
   State<FavUsers> createState() => _FavUsersState();
 }
-
-List<Map<String, dynamic>> favUsers = [];
 
 class _FavUsersState extends State<FavUsers> {
   int _selectedIndex = 2;
@@ -28,12 +25,11 @@ class _FavUsersState extends State<FavUsers> {
   }
 
   Future<void> loadFavUsers() async {
-    await MatrimonyDB().fetchUsers();
-    fetchFavUsers();
+    await fetchFavUsers();
   }
 
   Future<void> fetchFavUsers() async {
-    List<Map<String, dynamic>> data = await MatrimonyDB().getFavUsers();
+    List<Map<String, dynamic>> data = await API_Users().getFavouriteUsers();
     setState(() {
       favUsers = data;
     });
@@ -42,25 +38,25 @@ class _FavUsersState extends State<FavUsers> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xfff6f0ff),
+      backgroundColor: const Color(0xfff6f0ff),
       body: Column(
         children: [
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Expanded(
             child: favUsers.isNotEmpty
                 ? ListView.builder(
-              padding: const EdgeInsets.all(10),
-              itemCount: favUsers.length,
-              itemBuilder: (context, index) {
-                return _buildFavUserCard(index);
-              },
-            )
-                : Center(
-              child: Text(
-                "Koi Pasand Nathi!",
-                style: TextStyle(fontSize: 20, color: Colors.grey),
-              ),
-            ),
+                    padding: const EdgeInsets.all(10),
+                    itemCount: favUsers.length,
+                    itemBuilder: (context, index) {
+                      return _buildFavUserCard(index);
+                    },
+                  )
+                : const Center(
+                    child: Text(
+                      "Koi Pasand Nathi!",
+                      style: TextStyle(fontSize: 20, color: Colors.grey),
+                    ),
+                  ),
           ),
         ],
       ),
@@ -85,10 +81,11 @@ class _FavUsersState extends State<FavUsers> {
                       height: 40,
                       width: 40,
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Text(
                       "${favUsers[index]['name']}",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18),
                     ),
                   ],
                 ),
@@ -97,18 +94,25 @@ class _FavUsersState extends State<FavUsers> {
                 _buildUserInfo("Gender:", favUsers[index]['gender']),
               ],
             ),
-            Spacer(),
+            const Spacer(),
             Column(
               children: [
                 IconButton(
-                  icon: Icon(Icons.favorite_rounded, color: Colors.pinkAccent),
+                  icon: const Icon(Icons.favorite_rounded,
+                      color: Colors.pinkAccent),
                   iconSize: 25,
                   onPressed: () async {
-                    int userId = favUsers[index]['id'];
-                    int newFav = favUsers[index]['isFav'] == 1 ? 0 : 1;
-                    await MatrimonyDB().updateUser(id: userId, isFav: newFav);
+                    int currentFav = favUsers[index]['isFav'] is int
+                        ? favUsers[index]['isFav']
+                        : int.tryParse(
+                                favUsers[index]['isFav'].toString()) ??
+                            0;
+                    int newFav = currentFav == 1 ? 0 : 1;
+                    await API_Users().updateUser(
+                      {'isFav': newFav},
+                      favUsers[index]['id'].toString(),
+                    );
                     fetchFavUsers();
-                    print("Hello");
                   },
                 ),
               ],
@@ -124,12 +128,14 @@ class _FavUsersState extends State<FavUsers> {
       padding: const EdgeInsets.fromLTRB(50, 5, 0, 0),
       child: Row(
         children: [
-          Text(label, style: TextStyle(fontWeight: FontWeight.w700)),
-          SizedBox(width: 10),
+          Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(width: 10),
           Text(value),
         ],
       ),
     );
   }
-
 }
