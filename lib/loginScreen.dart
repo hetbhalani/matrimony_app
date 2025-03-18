@@ -50,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
 
             const SizedBox(height: 20),
             SizedBox(
-              width: 370,
+              width: 320,
               child: TextFormField(
                 controller: emailController,
                 decoration: const InputDecoration(

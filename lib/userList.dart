@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:matrimonial_app/abotUs.dart';
+import 'package:matrimonial_app/crudAPI.dart';
 import 'package:matrimonial_app/db.dart';
 import 'package:matrimonial_app/favUser.dart';
 import 'package:matrimonial_app/home.dart';
@@ -59,7 +60,7 @@ class _UserlistState extends State<Userlist> {
   }
 
   Future<void> loadUsers() async {
-    final users = await db.fetchUsers();
+    final users = await API_Users().fetchUser();
     setState(() {
       allUsers = users;
       searchedUsers = List.from(users);
@@ -89,7 +90,7 @@ class _UserlistState extends State<Userlist> {
           Row(
             children: [
               SizedBox(
-                width: 300,
+                width: 270,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 10, 0, 10),
                   child: TextFormField(
@@ -118,7 +119,7 @@ class _UserlistState extends State<Userlist> {
                       borderRadius: BorderRadius.all(Radius.circular(15))),
                   child: DropdownButton<String>(
                     hint: SizedBox(
-                      width: 72,
+                      width: 70,
                       child: Row(
                         children: [
                           SizedBox(width: 3),
@@ -170,6 +171,7 @@ class _UserlistState extends State<Userlist> {
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.9,
                           child: Card(
+                            color: Color(0xfffaf8ff),
                             elevation: 5,
                             child: InkWell(
                               onTap: () {

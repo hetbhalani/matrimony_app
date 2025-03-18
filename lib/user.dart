@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:matrimonial_app/UserList.dart';
 import 'package:matrimonial_app/abotUs.dart';
+import 'package:matrimonial_app/crudAPI.dart';
 import 'package:matrimonial_app/favUser.dart';
 import 'package:matrimonial_app/db.dart';
 import 'dart:ui';
@@ -60,7 +61,7 @@ class _CrudUserState extends State<CrudUser> {
   String? selectedCity;
   List<String> hobbies = ["Reading", "Traveling", "Gaming", "Cooking"];
   List<bool> selectedHobbies = [false, false, false, false];
-  DateTime initDate = DateTime.now();
+  DateTime initDate = DateTime(DateTime.now().year - 21,DateTime.now().month,DateTime.now().day);
 
   List<String> cities = [
     'Junagadh',
@@ -347,8 +348,8 @@ class _CrudUserState extends State<CrudUser> {
                             DateTime? pickedDate = await showDatePicker(
                               context: context,
                               initialDate: initDate,
-                              firstDate: DateTime(DateTime.now().year - 22),
-                              lastDate: DateTime.now(),
+                              firstDate: DateTime(1900),
+                              lastDate: DateTime(DateTime.now().year - 21,DateTime.now().month,DateTime.now().day),
                             );
                             initDate = pickedDate!;
 
@@ -498,7 +499,17 @@ class _CrudUserState extends State<CrudUser> {
                                           // password: password.text,
                                         );
 
-                                        await MatrimonyDB().addUser(
+                                        // await MatrimonyDB().addUser(
+                                        //     newUser.name,
+                                        //     newUser.email,
+                                        //     newUser.phone,
+                                        //     newUser.dob,
+                                        //     newUser.city,
+                                        //     newUser.gender,
+                                        //     newUser.hobbies,
+                                        //     newUser.isFav
+                                        // );
+                                        await API_Users().addUser(
                                             newUser.name,
                                             newUser.email,
                                             newUser.phone,
@@ -509,11 +520,11 @@ class _CrudUserState extends State<CrudUser> {
                                             newUser.isFav
                                         );
 
-                                        List<Map<String,dynamic>> updatedUser = await MatrimonyDB().fetchUsers();
-
-                                        setState(() {
-                                          users = updatedUser;
-                                        });
+                                        // List<Map<String,dynamic>> updatedUser = await MatrimonyDB().fetchUsers();
+                                        //
+                                        // setState(() {
+                                        //   users = updatedUser;
+                                        // });
 
                                         name.clear();
                                         email.clear();

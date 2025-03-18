@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:matrimonial_app/PageViewBuilder.dart';
 import 'package:matrimonial_app/db.dart';
 import 'package:matrimonial_app/favUser.dart';
 import 'package:matrimonial_app/home.dart';
@@ -101,7 +102,7 @@ class _UpdateUserState extends State<UpdateUser> {
               ),
             ],
           ),
-          backgroundColor: Color.fromRGBO(255, 34, 34, 0.8)
+          backgroundColor: Color(0xff69247C)
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -311,8 +312,8 @@ class _UpdateUserState extends State<UpdateUser> {
                           onTap: () async {
                             DateTime? pickedDate = await showDatePicker(
                               context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(DateTime.now().year - 22),
+                              initialDate: DateTime(DateTime.now().year - 22),
+                              firstDate: DateTime(1900),
                               lastDate: DateTime.now(),
                             );
 
@@ -404,7 +405,7 @@ class _UpdateUserState extends State<UpdateUser> {
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor:
-                                      Color.fromRGBO(255, 48, 48, 0.8),
+                                      Color(0xff69247C),
                                       minimumSize: Size(10, 50),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(
@@ -447,7 +448,7 @@ class _UpdateUserState extends State<UpdateUser> {
                                         );
                                         Navigator.push(
                                           context,
-                                          MaterialPageRoute(builder: (context) => Userlist()),
+                                          MaterialPageRoute(builder: (context) => Pageviewbuilder(initialIndex: 1,)),
                                         );
                                       } else {
                                         ScaffoldMessenger.of(context).showSnackBar(
