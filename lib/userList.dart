@@ -89,8 +89,8 @@ class _UserlistState extends State<Userlist> {
         children: [
           Row(
             children: [
-              SizedBox(
-                width: 270,
+              Expanded(
+                flex: 8,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 10, 0, 10),
                   child: TextFormField(
@@ -109,52 +109,58 @@ class _UserlistState extends State<Userlist> {
               SizedBox(
                 width: 10,
               ),
-              DropdownButtonHideUnderline(
-                child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.5,
-                      ),
-                      borderRadius: BorderRadius.all(Radius.circular(15))),
-                  child: DropdownButton<String>(
-                    hint: SizedBox(
-                      width: 70,
-                      child: Row(
-                        children: [
-                          SizedBox(width: 3),
-                          Text("Sort", style: TextStyle(fontSize: 18)),
-                          SizedBox(width: 5),
-                          Icon(Icons.filter_list, size: 23),
+              Expanded(
+                flex: 2, // 30% of available width
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 10),
+                  child: DropdownButtonHideUnderline(
+                    child: Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(15))),
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        hint: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Row(
+                            children: [
+                              Text("Sort", style: TextStyle(fontSize: 18)),
+                              Spacer(),
+                              Icon(Icons.filter_list, size: 23),
+                            ],
+                          ),
+                        ),
+                        items: [
+                          DropdownMenuItem(
+                            value: "A to Z",
+                            child: Text("A to Z"),
+                          ),
+                          DropdownMenuItem(
+                            value: "Z to A",
+                            child: Text("Z to A"),
+                          ),
+                          DropdownMenuItem(
+                            value: "by City",
+                            child: Text("by City"),
+                          ),
+                          DropdownMenuItem(
+                            value: "by Age",
+                            child: Text("by Age"),
+                          ),
                         ],
+                        icon: SizedBox.shrink(),
+                        onChanged: (String? val) {
+                          print("selected:$val");
+                          print(sortItems(val));
+                        },
                       ),
                     ),
-                    items: [
-                      DropdownMenuItem(
-                        value: "A to Z",
-                        child: Text("A to Z"),
-                      ),
-                      DropdownMenuItem(
-                        value: "Z to A",
-                        child: Text("Z to A"),
-                      ),
-                      DropdownMenuItem(
-                        value: "by City",
-                        child: Text("by City"),
-                      ),
-                      DropdownMenuItem(
-                        value: "by Age",
-                        child: Text("by Age"),
-                      ),
-                    ],
-                    icon: SizedBox.shrink(),
-                    onChanged: (String? val) {
-                      print("selected:$val");
-                      print(sortItems(val));
-                    },
                   ),
                 ),
-              )
+              ),
             ],
           ),
           SizedBox(
@@ -334,16 +340,21 @@ class _UserlistState extends State<Userlist> {
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
                                         IconButton(
-                                          icon: user['isFav'] == 1
-                                              ? Icon(Icons.favorite_rounded,
-                                                  color: Colors.pinkAccent)
-                                              : Icon(Icons
-                                                  .favorite_border_rounded),
+                                          icon: (user['isFav'] is int 
+                                                ? user['isFav'] 
+                                                : int.tryParse(user['isFav'].toString()) ?? 0) ==
+                                            1
+                                          ? Icon(Icons.favorite_rounded, color: Colors.pinkAccent)
+                                          : Icon(Icons.favorite_border_rounded),
                                           iconSize: 25,
                                           onPressed: () async {
-                                            await db.updateUser(
-                                              id: user['id'],
-                                              isFav: user['isFav'] == 0 ? 1 : 0,
+                                            int currentFav = user['isFav'] is int
+                                                ? user['isFav']
+                                                : int.tryParse(user['isFav'].toString()) ?? 0;
+                                            int newFav = currentFav == 0 ? 1 : 0;
+                                            await API_Users().updateUser(
+                                              {'isFav': newFav},
+                                              user['id'].toString(),
                                             );
                                             loadUsers();
                                           },
@@ -384,8 +395,8 @@ class _UserlistState extends State<Userlist> {
                                                               Text("Cancel")),
                                                       TextButton(
                                                           onPressed: () async {
-                                                            await db.deleteUser(
-                                                                user['id']);
+                                                            API_Users a1 =API_Users();
+                                                            await a1.deleteUser(user['id']);
                                                             loadUsers();
                                                             ScaffoldMessenger
                                                                     .of(context)

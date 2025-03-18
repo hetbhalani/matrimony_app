@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:matrimonial_app/PageViewBuilder.dart';
+import 'package:matrimonial_app/crudAPI.dart';
 import 'package:matrimonial_app/db.dart';
 import 'package:matrimonial_app/favUser.dart';
 import 'package:matrimonial_app/home.dart';
@@ -9,29 +10,29 @@ import 'package:matrimonial_app/user.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:matrimonial_app/userList.dart';
 
-class User {
-  String name;
-  String email;
-  String phone;
-  String dob;
-  String city;
-  String gender;
-  int isFav;
-  // String hobbies;
-  // String password;
-
-  User({
-    required this.name,
-    required this.email,
-    required this.phone,
-    required this.dob,
-    required this.city,
-    required this.gender,
-    required this.isFav,
-    // required this.hobbies,
-    // required this.password,
-  });
-}
+// class User {
+//   String name;
+//   String email;
+//   String phone;
+//   String dob;
+//   String city;
+//   String gender;
+//   int isFav;
+//   // String hobbies;
+//   // String password;
+//
+//   User({
+//     required this.name,
+//     required this.email,
+//     required this.phone,
+//     required this.dob,
+//     required this.city,
+//     required this.gender,
+//     required this.isFav,
+//     // required this.hobbies,
+//     // required this.password,
+//   });
+// }
 
 class UpdateUser extends StatefulWidget {
   final Map<String, dynamic> user;
@@ -50,6 +51,7 @@ class _UpdateUserState extends State<UpdateUser> {
   late TextEditingController gender;
   late TextEditingController isFav;
   String selectedGender = "";
+  String selectedCity = "";
 
   List<String> cities = [
     'Junagadh',
@@ -81,6 +83,11 @@ class _UpdateUserState extends State<UpdateUser> {
     gender = TextEditingController(text: widget.user['gender'].toString());
     isFav = TextEditingController(text: widget.user['isFav'].toString());
     selectedGender = widget.user['gender'].toString();
+    
+    // Set selectedCity to a valid value or fallback to a default
+    selectedCity = cities.contains(widget.user['city'].toString())
+        ? widget.user['city'].toString()
+        : cities[0];
     print("======================update vada use ni city ${widget.user['city']} =================================");
   }
 
@@ -355,7 +362,7 @@ class _UpdateUserState extends State<UpdateUser> {
                           height: 30,
                         ),
                         DropdownButtonFormField<String>(
-                          value: city.text??'Rajkot',
+                          value: selectedCity,
                           focusColor: Colors.transparent,
                           decoration: InputDecoration(
                             labelText: "Select Your City",
@@ -375,8 +382,9 @@ class _UpdateUserState extends State<UpdateUser> {
                           }).toList(),
                           onChanged: (String? newValue) {
                             setState(() {
-                              // selectedCity = newValue;
-                              city.text = newValue!;
+                              selectedCity = newValue!;
+                              // Optionally update your city controller too
+                              city.text = newValue;
                             });
                           },
                           validator: (value) {
@@ -414,28 +422,19 @@ class _UpdateUserState extends State<UpdateUser> {
                                     ),
                                     onPressed: () async {
                                       if (fk.currentState!.validate()) {
-                                        User newUser = User(
-                                          name: name.text,
-                                          email: email.text,
-                                          phone: phone.text,
-                                          dob: dob.text,
-                                          city: city.text,
-                                          gender: selectedGender,
-                                          isFav: widget.user['isFav'],                                          // hobbies: selectedHobbiesString,
-                                          // password: password.text,
+                                        API_Users a1 = API_Users();
+
+                                        await a1.updateUser({
+                                          'name': name.text,
+                                          'email': email.text,
+                                          'phone': phone.text,
+                                          'dob': dob.text,
+                                          'city': city.text,
+                                          'gender': selectedGender,
+                                          'isFav': int.parse(isFav.text), // convert isFav to int if needed
+                                        },
+                                        widget.user['id']
                                         );
-                                        // Call the DB update method instead of updating a local list.
-                                        await MatrimonyDB().updateUser(
-                                          id: widget.user['id'],
-                                          name: newUser.name,
-                                          email: newUser.email,
-                                          phone: newUser.phone,
-                                          dob: newUser.dob,
-                                          city: newUser.city,
-                                          gender: newUser.gender,
-                                          isFav: newUser.isFav,
-                                        );
-                                        // Clear controllers if needed and show confirmation
                                         name.clear();
                                         email.clear();
                                         phone.clear();
