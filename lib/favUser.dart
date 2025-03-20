@@ -4,6 +4,7 @@ import 'package:matrimonial_app/crudAPI.dart';
 import 'package:matrimonial_app/user.dart';
 import 'package:matrimonial_app/userList.dart';
 import 'package:matrimonial_app/home.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'abotUs.dart';
 
 List<Map<String, dynamic>> favUsers = [];
@@ -17,6 +18,7 @@ class FavUsers extends StatefulWidget {
 
 class _FavUsersState extends State<FavUsers> {
   int _selectedIndex = 2;
+  bool _isLoading = true;  // Add loading state
 
   @override
   void initState() {
@@ -25,7 +27,12 @@ class _FavUsersState extends State<FavUsers> {
   }
 
   Future<void> loadFavUsers() async {
-    await fetchFavUsers();
+    setState(() => _isLoading = true);
+    try {
+      await fetchFavUsers();
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   Future<void> fetchFavUsers() async {
@@ -43,27 +50,39 @@ class _FavUsersState extends State<FavUsers> {
         children: [
           const SizedBox(height: 10),
           Expanded(
-            child: favUsers.isNotEmpty
-                ? ListView.builder(
-                    padding: const EdgeInsets.all(10),
-                    itemCount: favUsers.length,
-                    itemBuilder: (context, index) {
-                      return _buildFavUserCard(index);
-                    },
-                  )
-                : const Center(
-                    child: Text(
-                      "Koi Pasand Nathi!",
-                      style: TextStyle(fontSize: 20, color: Colors.grey),
+            child: Skeletonizer(
+              enabled: _isLoading,
+              child: favUsers.isEmpty && !_isLoading
+                  ? const Center(
+                      child: Text(
+                        "Koi Pasand Nathi!",
+                        style: TextStyle(fontSize: 20, color: Colors.grey),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(10),
+                      itemCount: _isLoading ? 5 : favUsers.length, // Show 5 skeleton items while loading
+                      itemBuilder: (context, index) {
+                        final user = _isLoading
+                            ? {
+                                'name': 'John Doe',
+                                'city': 'New York',
+                                'phone': '1234567890',
+                                'gender': 'Male',
+                                'isFav': 1,
+                              }
+                            : favUsers[index];
+                        return _buildFavUserCard(index, user);
+                      },
                     ),
-                  ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFavUserCard(int index) {
+  Widget _buildFavUserCard(int index, Map<String, dynamic> user) {
     return Card(
       elevation: 5,
       child: ListTile(
@@ -75,7 +94,7 @@ class _FavUsersState extends State<FavUsers> {
                 Row(
                   children: [
                     Image.asset(
-                      favUsers[index]['gender'] == 'Male'
+                      user['gender'] == 'Male'
                           ? 'assets/imgs/male.png'
                           : 'assets/imgs/female.png',
                       height: 40,
@@ -83,40 +102,44 @@ class _FavUsersState extends State<FavUsers> {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      "${favUsers[index]['name']}",
+                      "${user['name']}",
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 18),
                     ),
                   ],
                 ),
-                _buildUserInfo("City:", favUsers[index]['city']),
-                _buildUserInfo("Phone:", favUsers[index]['phone']),
-                _buildUserInfo("Gender:", favUsers[index]['gender']),
+                _buildUserInfo("City:", user['city']),
+                _buildUserInfo("Phone:", user['phone']),
+                _buildUserInfo("Gender:", user['gender']),
               ],
             ),
             const Spacer(),
-            Column(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.favorite_rounded,
-                      color: Colors.pinkAccent),
-                  iconSize: 25,
-                  onPressed: () async {
-                    int currentFav = favUsers[index]['isFav'] is int
-                        ? favUsers[index]['isFav']
-                        : int.tryParse(
-                                favUsers[index]['isFav'].toString()) ??
-                            0;
-                    int newFav = currentFav == 1 ? 0 : 1;
-                    await API_Users().updateUser(
-                      {'isFav': newFav},
-                      favUsers[index]['id'].toString(),
-                    );
-                    fetchFavUsers();
-                  },
-                ),
-              ],
-            ),
+            if (!_isLoading) // Only show favorite button when not loading
+              Column(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.favorite_rounded,
+                        color: Colors.pinkAccent),
+                    iconSize: 25,
+                    onPressed: () async {
+                      setState(() => user['isUpdating'] = true);
+                      try {
+                        int currentFav = user['isFav'] is int
+                            ? user['isFav']
+                            : int.tryParse(user['isFav'].toString()) ?? 0;
+                        int newFav = currentFav == 1 ? 0 : 1;
+                        await API_Users().updateUser(
+                          {'isFav': newFav},
+                          user['id'].toString(),
+                        );
+                        fetchFavUsers();
+                      } finally {
+                        setState(() => user['isUpdating'] = false);
+                      }
+                    },
+                  ),
+                ],
+              ),
           ],
         ),
       ),

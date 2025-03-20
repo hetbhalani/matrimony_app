@@ -7,6 +7,7 @@ import 'package:matrimonial_app/home.dart';
 import 'package:matrimonial_app/updateForm.dart';
 import 'package:matrimonial_app/user.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 // Map<String, dynamic> userForUpdate = {};
 
@@ -52,6 +53,7 @@ class _UserlistState extends State<Userlist> {
   List<Map<String, dynamic>> searchedUsers = [];
   List<Map<String, dynamic>> allUsers = [];
   List<Map<String, dynamic>> sortedUser = [];
+  bool _isLoading = true; // Add loading state
 
   @override
   void initState() {
@@ -60,11 +62,20 @@ class _UserlistState extends State<Userlist> {
   }
 
   Future<void> loadUsers() async {
-    final users = await API_Users().fetchUser();
-    setState(() {
-      allUsers = users;
-      searchedUsers = List.from(users);
-    });
+    setState(() => _isLoading = true);
+    try {
+      final users = await API_Users().fetchUser();
+      setState(() {
+        allUsers = users;
+        searchedUsers = List.from(users);
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load users')),
+      );
+    }
   }
 
   void filterUsers(String query) {
@@ -110,7 +121,7 @@ class _UserlistState extends State<Userlist> {
                 width: 10,
               ),
               Expanded(
-                flex: 2, // 30% of available width
+                flex: 2,
                 child: Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: DropdownButtonHideUnderline(
@@ -167,293 +178,305 @@ class _UserlistState extends State<Userlist> {
             height: 10,
           ),
           Expanded(
-            child: searchedUsers.isEmpty
-                ? Center(child: Text('No users found'))
-                : ListView.builder(
-                    itemCount: searchedUsers.length,
-                    itemBuilder: (context, index) {
-                      final user = searchedUsers[index];
-                      return Center(
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          child: Card(
-                            color: Color(0xfffaf8ff),
-                            elevation: 5,
-                            child: InkWell(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            20)), // Rounded Corners
-                                    contentPadding: EdgeInsets.all(
-                                        20), // Padding for neat UI
-                                    content: Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.8,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
+            child: Skeletonizer(
+              enabled: _isLoading,
+              child: searchedUsers.isEmpty && !_isLoading
+                  ? Center(child: Text('No users found'))
+                  : ListView.builder(
+                      itemCount: _isLoading ? 5 : searchedUsers.length, // Show 5 skeleton items while loading
+                      itemBuilder: (context, index) {
+                        final user = _isLoading 
+                            ? {
+                                'name': 'John Doe',
+                                'city': 'New York',
+                                'phone': '1234567890',
+                                'gender': 'Male',
+                                'isFav': 0,
+                              }
+                            : searchedUsers[index];
+                        return Center(
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            child: Card(
+                              color: Color(0xfffaf8ff),
+                              elevation: 5,
+                              child: InkWell(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              20)), // Rounded Corners
+                                      contentPadding: EdgeInsets.all(
+                                          20), // Padding for neat UI
+                                      content: Container(
+                                        width: MediaQuery.of(context).size.width *
+                                            0.8,
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            CircleAvatar(
+                                              radius: 50,
+                                              backgroundImage: AssetImage(
+                                                user['gender'] == "Male"
+                                                    ? 'assets/imgs/male.png'
+                                                    : 'assets/imgs/female.png',
+                                              ),
+                                            ),
+                                            SizedBox(height: 15),
+                                            Text(
+                                              user['name'],
+                                              style: TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            Divider(color: Colors.grey[300]),
+                                            SizedBox(height: 10),
+                                            Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  userInfo(
+                                                    icon: Icons.email_outlined,
+                                                    label: "Email",
+                                                    value: user['email'],
+                                                  ),
+                                                  userInfo(
+                                                    icon: Icons.phone,
+                                                    label: "Phone",
+                                                    value: user['phone'],
+                                                  ),
+                                                  userInfo(
+                                                      icon: Icons.person,
+                                                      label: "Gender",
+                                                      value: user['gender']),
+                                                  userInfo(
+                                                    icon: Icons
+                                                        .sports_esports_outlined,
+                                                    label: "Hobbies",
+                                                    value: user['hobbies'] != null
+                                                        ? (user['hobbies']
+                                                                as List)
+                                                            .join(", ")
+                                                        : "No hobbies",
+                                                  ),
+                                                  userInfo(
+                                                    icon: Icons
+                                                        .location_city_outlined,
+                                                    label: "City",
+                                                    value: user['city'],
+                                                  ),
+                                                  userInfo(
+                                                    icon: Icons.cake_rounded,
+                                                    label: "Age",
+                                                    value:
+                                                        "${calcAge(user['dob'])} Years",
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          child: Text("Close",
+                                              style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 16)),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                child: ListTile(
+                                  title: Row(
+                                    children: [
+                                      Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          CircleAvatar(
-                                            radius: 50,
-                                            backgroundImage: AssetImage(
-                                              user['gender'] == "Male"
-                                                  ? 'assets/imgs/male.png'
-                                                  : 'assets/imgs/female.png',
+                                          Row(
+                                            children: [
+                                              Image.asset(
+                                                user['gender'] == "Male"
+                                                    ? 'assets/imgs/male.png'
+                                                    : 'assets/imgs/female.png',
+                                                height: 35,
+                                                width: 35,
+                                              ),
+                                              SizedBox(width: 12),
+                                              Text(
+                                                "${user['name']}",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                50, 0, 0, 0),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  "City:",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w700),
+                                                ),
+                                                SizedBox(width: 8),
+                                                Text(user['city']),
+                                              ],
                                             ),
                                           ),
-                                          SizedBox(height: 15),
-                                          Text(
-                                            user['name'],
-                                            style: TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.bold),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                          Divider(color: Colors.grey[300]),
-                                          SizedBox(height: 10),
-                                          Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                50, 5, 0, 0),
+                                            child: Row(
                                               children: [
-                                                userInfo(
-                                                  icon: Icons.email_outlined,
-                                                  label: "Email",
-                                                  value: user['email'],
+                                                Text(
+                                                  "Phone:",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w700),
                                                 ),
-                                                userInfo(
-                                                  icon: Icons.phone,
-                                                  label: "Phone",
-                                                  value: user['phone'],
-                                                ),
-                                                userInfo(
-                                                    icon: Icons.person,
-                                                    label: "Gender",
-                                                    value: user['gender']),
-                                                userInfo(
-                                                  icon: Icons
-                                                      .sports_esports_outlined,
-                                                  label: "Hobbies",
-                                                  value: user['hobbies'] != null
-                                                      ? (user['hobbies']
-                                                              as List)
-                                                          .join(", ")
-                                                      : "No hobbies",
-                                                ),
-                                                userInfo(
-                                                  icon: Icons
-                                                      .location_city_outlined,
-                                                  label: "City",
-                                                  value: user['city'],
-                                                ),
-                                                userInfo(
-                                                  icon: Icons.cake_rounded,
-                                                  label: "Age",
-                                                  value:
-                                                      "${calcAge(user['dob'])} Years",
-                                                )
+                                                SizedBox(width: 10),
+                                                Text(user['phone']),
                                               ],
                                             ),
                                           ),
                                         ],
                                       ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: Text("Close",
-                                            style: TextStyle(
-                                                color: Colors.red,
-                                                fontSize: 16)),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                              child: ListTile(
-                                title: Row(
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
+                                      Spacer(),
+                                      if (!_isLoading) // Only show action buttons when not loading
+                                        Column(
+                                          mainAxisAlignment: MainAxisAlignment.end,
                                           children: [
-                                            Image.asset(
-                                              user['gender'] == "Male"
-                                                  ? 'assets/imgs/male.png'
-                                                  : 'assets/imgs/female.png',
-                                              height: 35,
-                                              width: 35,
+                                            IconButton(
+                                              icon: (user['isFav'] is int 
+                                                    ? user['isFav'] 
+                                                    : int.tryParse(user['isFav'].toString()) ?? 0) ==
+                                                1
+                                              ? Icon(Icons.favorite_rounded, color: Colors.pinkAccent)
+                                              : Icon(Icons.favorite_border_rounded),
+                                              iconSize: 25,
+                                              onPressed: () async {
+                                                int currentFav = user['isFav'] is int
+                                                    ? user['isFav']
+                                                    : int.tryParse(user['isFav'].toString()) ?? 0;
+                                                int newFav = currentFav == 0 ? 1 : 0;
+                                                await API_Users().updateUser(
+                                                  {'isFav': newFav},
+                                                  user['id'].toString(),
+                                                );
+                                                loadUsers();
+                                              },
                                             ),
-                                            SizedBox(width: 12),
-                                            Text(
-                                              "${user['name']}",
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 18,
-                                              ),
+                                            IconButton(
+                                              icon: Icon(Icons.edit),
+                                              iconSize: 25,
+                                              color: Colors.blueAccent,
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => UpdateUser(user: searchedUsers[index]),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            IconButton(
+                                              icon: Icon(Icons.delete),
+                                              iconSize: 25,
+                                              color: Colors.red,
+                                              onPressed: () {
+                                                showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return AlertDialog(
+                                                        title:
+                                                            Text("Are You Sure?"),
+                                                        actions: [
+                                                          TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              child:
+                                                                  Text("Cancel")),
+                                                          TextButton(
+                                                              onPressed: () async {
+                                                                API_Users a1 =API_Users();
+                                                                await a1.deleteUser(user['id']);
+                                                                loadUsers();
+                                                                ScaffoldMessenger
+                                                                        .of(context)
+                                                                    .showSnackBar(
+                                                                  const SnackBar(
+                                                                    content: Row(
+                                                                      children: [
+                                                                        Icon(
+                                                                            Icons
+                                                                                .delete_outline_rounded,
+                                                                            color: Colors
+                                                                                .red),
+                                                                        SizedBox(
+                                                                            width:
+                                                                                8),
+                                                                        Text(
+                                                                            "User Deleted successfully!"),
+                                                                      ],
+                                                                    ),
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .black87,
+                                                                    behavior:
+                                                                        SnackBarBehavior
+                                                                            .floating,
+                                                                    duration:
+                                                                        Duration(
+                                                                            seconds:
+                                                                                3),
+                                                                  ),
+                                                                );
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                              child: Text(
+                                                                "Delete",
+                                                                style: TextStyle(
+                                                                    color:
+                                                                        Colors.red),
+                                                              )),
+                                                        ],
+                                                      );
+                                                    });
+                                              },
                                             ),
                                           ],
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              50, 0, 0, 0),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                "City:",
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.w700),
-                                              ),
-                                              SizedBox(width: 8),
-                                              Text(user['city']),
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              50, 5, 0, 0),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                "Phone:",
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.w700),
-                                              ),
-                                              SizedBox(width: 10),
-                                              Text(user['phone']),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Spacer(),
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        IconButton(
-                                          icon: (user['isFav'] is int 
-                                                ? user['isFav'] 
-                                                : int.tryParse(user['isFav'].toString()) ?? 0) ==
-                                            1
-                                          ? Icon(Icons.favorite_rounded, color: Colors.pinkAccent)
-                                          : Icon(Icons.favorite_border_rounded),
-                                          iconSize: 25,
-                                          onPressed: () async {
-                                            int currentFav = user['isFav'] is int
-                                                ? user['isFav']
-                                                : int.tryParse(user['isFav'].toString()) ?? 0;
-                                            int newFav = currentFav == 0 ? 1 : 0;
-                                            await API_Users().updateUser(
-                                              {'isFav': newFav},
-                                              user['id'].toString(),
-                                            );
-                                            loadUsers();
-                                          },
-                                        ),
-                                        IconButton(
-                                          icon: Icon(Icons.edit),
-                                          iconSize: 25,
-                                          color: Colors.blueAccent,
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => UpdateUser(user: searchedUsers[index]),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                        IconButton(
-                                          icon: Icon(Icons.delete),
-                                          iconSize: 25,
-                                          color: Colors.red,
-                                          onPressed: () {
-                                            showDialog(
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context) {
-                                                  return AlertDialog(
-                                                    title:
-                                                        Text("Are You Sure?"),
-                                                    actions: [
-                                                      TextButton(
-                                                          onPressed: () {
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                          },
-                                                          child:
-                                                              Text("Cancel")),
-                                                      TextButton(
-                                                          onPressed: () async {
-                                                            API_Users a1 =API_Users();
-                                                            await a1.deleteUser(user['id']);
-                                                            loadUsers();
-                                                            ScaffoldMessenger
-                                                                    .of(context)
-                                                                .showSnackBar(
-                                                              const SnackBar(
-                                                                content: Row(
-                                                                  children: [
-                                                                    Icon(
-                                                                        Icons
-                                                                            .delete_outline_rounded,
-                                                                        color: Colors
-                                                                            .red),
-                                                                    SizedBox(
-                                                                        width:
-                                                                            8),
-                                                                    Text(
-                                                                        "User Deleted successfully!"),
-                                                                  ],
-                                                                ),
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .black87,
-                                                                behavior:
-                                                                    SnackBarBehavior
-                                                                        .floating,
-                                                                duration:
-                                                                    Duration(
-                                                                        seconds:
-                                                                            3),
-                                                              ),
-                                                            );
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop();
-                                                          },
-                                                          child: Text(
-                                                            "Delete",
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.red),
-                                                          )),
-                                                    ],
-                                                  );
-                                                });
-                                          },
-                                        ),
-                                      ],
-                                    )
-                                  ],
+                                        )
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    ),
+            ),
           ),
         ],
       ),
@@ -493,14 +516,14 @@ class _UserlistState extends State<Userlist> {
     List<Map<String, dynamic>> sortedList = List.from(searchedUsers);
     setState(() {
       if (selectedValue == "A to Z") {
-        searchedUsers.sort((a, b) => a['name'].compareTo(b['name']));
+        searchedUsers.sort((a, b) => (a['name'].toString().toLowerCase()).compareTo(b['name'].toString().toLowerCase()));
       }
       else if (selectedValue == "Z to A") {
-        searchedUsers.sort((a, b) => b['name'].compareTo(a['name']));
+        searchedUsers.sort((a, b) => (b['name'].toString().toLowerCase()).compareTo(a['name'].toString().toLowerCase()));
       }
       else if (selectedValue == "by City") {
         searchedUsers.sort((a, b) =>
-            a['city'].toLowerCase().compareTo(b['city'].toLowerCase()));
+            a['city'].toString().toLowerCase().compareTo(b['city'].toString().toLowerCase()));
       }
       else if (selectedValue == "by Age") {
         searchedUsers

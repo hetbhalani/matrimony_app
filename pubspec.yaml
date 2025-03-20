@@ -40,6 +40,7 @@ dependencies:
   shared_preferences: ^2.5.2
   flutter_native_splash: ^2.4.0
   lottie: ^3.0.0
+  skeletonizer: ^1.4.3
 
 
   # The following adds the Cupertino Icons font to your application.

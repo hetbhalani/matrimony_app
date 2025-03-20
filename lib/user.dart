@@ -11,6 +11,8 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
+import 'PageViewBuilder.dart';
+
 // List<Map<String, dynamic>> users = [];
 
 class User {
@@ -547,6 +549,12 @@ class _CrudUserState extends State<CrudUser> {
                                             backgroundColor: Colors.black87,
                                             behavior: SnackBarBehavior.floating,
                                             duration: Duration(seconds: 3),
+                                          ),
+                                        );
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => Pageviewbuilder(initialIndex: 1),
                                           ),
                                         );
                                         print(users);

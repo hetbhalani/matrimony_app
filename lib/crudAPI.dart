@@ -27,7 +27,8 @@ class API_Users{
     final uri = Uri.parse(url);
     final response = await http.get(uri);
     print(response.body);
-    return List<Map<String, dynamic>>.from(jsonDecode(response.body));
+    List<Map<String, dynamic>> users = List<Map<String, dynamic>>.from(jsonDecode(response.body));
+    return users.reversed.toList();  
   }
 
   Future<void> updateUser(Map<String, dynamic> user,String id)async{
